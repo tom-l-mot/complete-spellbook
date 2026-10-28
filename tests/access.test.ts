@@ -46,10 +46,12 @@ test('flexible and studious spell slots stay protected, regardless of ordinary-l
   const studious = recognize(e, [e], 'magus', ['studious-spells'], false, false);
   assert.equal(studious.kind, 'automatic');
   if (studious.kind === 'automatic') assert.deepEqual(studious.allowedRanks, [0]);
-  const flexible = { ...e, flexible: true };
+  const flexible = { ...e, flexible: true, slots: e.slots.map(s => s.rank === 0 ? s : { ...s, prepared: [] }) };
   const result = recognize(flexible, [flexible], 'witch', [], false, false);
   assert.equal(result.kind, 'automatic');
   if (result.kind === 'automatic') { assert.deepEqual(result.allowedRanks, [0]); assert.deepEqual(result.reviewRanks, []); }
+  flexible.slots[0]!.prepared = [];
+  assert.equal(recognize(flexible, [flexible], 'witch', [], false, false).kind, 'review');
 });
 test('Wizard curriculum cantrips are protected and Unified Magical Theory needs no review', () => {
   const e = entry('arcane');
