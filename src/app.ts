@@ -1,4 +1,4 @@
-import { MODULE_ID, matches, preparationError, parsePreset, text, comparePresets, favoriteKey } from './core.ts';
+import { MODULE_ID, matches, preparationError, parsePreset, text, comparePresets, favoriteKey, slotShape } from './core.ts';
 import type { Entry, Filters, Preset, Spell } from './core.ts';
 import { Spellbook } from './runtime.ts';
 
@@ -42,6 +42,7 @@ export class CompleteSpellbook extends foundry.applications.api.HandlebarsApplic
     const entries = this.book.entries();
     if (this.entryId && !entries.some(e => e.id === this.entryId)) this.entryId = entries[0]?.id ?? '';
     const current = entries.find(e => e.id === this.entryId);
+    const recognition = current ? this.book.recognition(current) : null;
     const scope = current ? [current] : entries;
     this.rows = (await Promise.all(scope.map(async e => (await this.book.list(e.id)).map(spell => ({ entryId: e.id, spell }))))).flat();
     const prepared = new Set(entries.flatMap(e => e.slots.flatMap(s => s.prepared.map(p => p.id).filter((id): id is string => !!id))));
@@ -58,9 +59,12 @@ export class CompleteSpellbook extends foundry.applications.api.HandlebarsApplic
       name: this.book.actor.items.get(slot.id ?? '')?.name ?? t('Empty'), expended: slot.expended,
       editable: !preparationError(current, this.book.grant(current), null, group.rank, index) }))) ?? [];
     const all = this.rows.map(r => r.spell);
+    const editableRanks = new Map(entries.map(e => [e.id, e.slots.filter(s => s.max > 0 && !preparationError(e, this.book.grant(e), null, s.rank, 0)).map(s => s.rank)]));
     return { actorName: this.book.actor.name, isGM: game.user.isGM, busy: this.busy, hasEntry: !!current, hasEntries: !!entries.length,
       entryName: current?.name, entryMode: current ? `${current.category}${current.flexible ? ' / flexible' : ''} · ${current.tradition}` : t('Unified'),
       access: current && this.book.grant(current)?.fullTradition ? t('TraditionAccess') : t('KnownAccess'),
+      canConfigure: !!current && recognition?.kind !== 'native',
+      setupMessage: recognition ? t(recognition.reason) : '',
       entries: entries.map(e => ({ ...e, selected: e.id === this.entryId })),
       rows: visible.slice(this.page * 100, this.page * 100 + 100).map(({ entryId, spell }) => ({ ...spell, entryId,
         entryName: entries.find(e => e.id === entryId)?.name, key: spell.key, virtual: spell.origin.kind === 'virtual',
@@ -69,7 +73,8 @@ export class CompleteSpellbook extends foundry.applications.api.HandlebarsApplic
         selectable: canImport && spell.origin.kind === 'virtual',
         favorite: favorites.has(favoriteKey(spell)), checked: this.selected.has(`${entryId}|${spell.key}`),
         signature: spell.origin.kind === 'owned' && spell.origin.signature,
-        canPrepare: entries.find(e => e.id === entryId)?.category === 'prepared',
+        canPrepare: spell.category !== 'focus' && spell.category !== 'ritual' && editableRanks.get(entryId)?.some(rank =>
+          (rank === 0) === (spell.category === 'cantrip') && (rank === 0 || rank >= spell.rank)),
         canImport: spell.origin.kind === 'virtual' && game.settings.get(MODULE_ID, 'import') === true,
         showFavorite: game.settings.get(MODULE_ID, 'favorites') === true })),
       filters: this.filters, ranks: options(Array.from({ length: 11 }, (_, n) => String(n)), this.filters.rank),
@@ -84,11 +89,12 @@ export class CompleteSpellbook extends foundry.applications.api.HandlebarsApplic
       slots, filled: slots.filter(s => s.name !== t('Empty')).length, slotCount: slots.length,
       resources: current?.slots.filter(s => s.max > 0).map(s => ({ rank: s.rank, max: s.max,
         value: current.category === 'prepared' && (!current.flexible || s.rank === 0) ? s.prepared.slice(0, s.max).filter(p => !p.expended).length : s.value })) ?? [],
-      presets: current ? this.book.presets(current.id) : [], showPresets: !!current && game.settings.get(MODULE_ID, 'presets') === true,
+      presets: current ? this.book.presets(current.id) : [], showPresets: !!current && current.category === 'prepared' && game.settings.get(MODULE_ID, 'presets') === true,
+      canSavePreset: slots.some(s => s.editable),
       showImport: canImport, selectionDisabled: !this.selectableKeys.length, noneSelected: !this.selected.size,
       allSelected: !!this.selectableKeys.length && this.selected.size === this.selectableKeys.length,
-      showNativeNotice: !!current && (current.category !== 'prepared' || current.flexible),
-      needsReview: !!current && current.category === 'prepared' && !!slots.length && !slots.some(s => s.editable)
+      showNativeNotice: !!current && (recognition?.kind === 'native' || current.flexible),
+      needsReview: !!current && this.book.needsSetup(current)
     };
   }
   protected override _onRender(): void {
@@ -208,18 +214,18 @@ export class CompleteSpellbook extends foundry.applications.api.HandlebarsApplic
   }
   private async configure(): Promise<void> {
     if (!game.user.isGM) throw new Error(t('GMOnly'));
-    const e = this.book.entry(this.entryId), g = this.book.grant(e);
-    const ranks = e.slots.filter(s => s.max > 0 && s.prepared.length === s.max).map(s => s.rank);
+    const e = this.book.entry(this.entryId), g = this.book.grant(e), recognition = this.book.recognition(e);
+    if (recognition.kind === 'native') return;
+    const ranks = e.slots.filter(s => s.max > 0 && s.prepared.length === s.max && (!e.flexible || s.rank === 0)).map(s => s.rank);
+    const full = recognition.kind === 'automatic' ? recognition.fullTradition : g?.fullTradition ?? false;
+    const content = `<p><strong>${escapeHTML(e.name)}</strong></p><p>${t(this.book.needsSetup(e) ? recognition.reason : 'SetupConfirmed')}</p>` +
+      (recognition.kind === 'review' ? `<label>${t('SpellAccess')}<select name="access"><option value="known" ${!full ? 'selected' : ''}>${t('KnownChoice')}</option><option value="tradition" ${full ? 'selected' : ''}>${t('TraditionChoice')}</option></select></label><p>${t('AccessHelp')}</p>` : `<p>${t(full ? 'TraditionAccess' : 'KnownAccess')}</p>`) +
+      `<fieldset><legend>${t('SafeRanks')}</legend><p>${t('RankHelp')}</p>${ranks.map(rank => `<label style="display:flex;align-items:center;gap:0.5rem"><input type="checkbox" name="rank${rank}" ${g?.preparation && g.allowedRanks.includes(rank) && g.slotShape === slotShape(e) ? 'checked' : ''}>${rank === 0 ? t('Cantrips') : `${t('Rank')} ${rank}`}</label>`).join('')}</fieldset>`;
     const result = await foundry.applications.api.DialogV2.input({ window: { title: t('Configure') }, content:
-      `<p>${t('GMWarning')}</p><p>${escapeHTML(e.name)} · ${escapeHTML(e.tradition)} · ${escapeHTML(this.book.actor.class?.slug ?? '')}</p>` +
-      `<label><input type="checkbox" name="full" ${g?.fullTradition ? 'checked' : ''}>${t('FullTradition')}</label>` +
-      `<label>${t('ExtraSources')}<textarea name="extra">${escapeHTML(g?.extra.join('\n') ?? '')}</textarea></label>` +
-      `<label><input type="checkbox" name="preparation">${t('ConfirmPreparation')}</label>` +
-      `<p>${t('AvailableRanks')} ${ranks.join(', ')}</p><label>${t('AllowedRanks')}<input name="ranks" value="${escapeHTML(g?.allowedRanks.join(',') ?? '')}"></label>` });
+      content });
     if (!result) return;
-    const allowedRanks = text(result.ranks).split(',').map(s => s.trim()).filter(Boolean).map(Number);
-    if (allowedRanks.some(rank => !ranks.includes(rank))) throw new Error(t('InvalidSlots'));
-    await this.book.configure(e.id, { fullTradition: result.full === true, extra: text(result.extra).split(/\s+/).filter(Boolean), preparation: result.preparation === true, allowedRanks });
+    const allowedRanks = ranks.filter(rank => result[`rank${rank}`] === true);
+    await this.book.configure(e.id, { fullTradition: recognition.kind === 'automatic' ? full : result.access === 'tradition', extra: g?.extra ?? [], preparation: true, allowedRanks });
   }
   override async close(options?: Record<string, unknown>): Promise<this> {
     this.listeners.abort(); clearTimeout(this.searchTimer); this.importing?.abort(); openApps.delete(this); return super.close(options);

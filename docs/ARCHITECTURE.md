@@ -2,7 +2,7 @@
 
 ## Usage
 
-An owner opens Complete Spellbook from a character sheet, selects an entry or all entries, and searches existing and eligible virtual spells. The GM approves full-tradition access once per suitable entry. A preparation action imports only the selected virtual spell. Casting remains on the native PF2e sheet.
+An owner opens Complete Spellbook from a character sheet, selects an entry or all entries, and searches existing and eligible virtual spells. Supported ordinary entries are recognized automatically. The GM checks ambiguous entries and uncertain whole ranks. A preparation action imports only the selected virtual spell. Casting remains on the native PF2e sheet.
 
 ```ts
 const book = new Spellbook(actor, game, catalog);
@@ -14,7 +14,7 @@ await book.applyPreset(entryId, preset, preview.fingerprint);
 
 ## Ownership
 
-`core.ts` owns pure eligibility, slot validation, filters and assignment-only presets. Spell origins distinguish virtual compendium rows from actor-owned items. `runtime.ts` owns all document effects, the compendium cache and GM grants. `app.ts` owns display and dialogs. `main.ts` connects hooks and version guards; `settings.ts` registers configuration. UI actions cannot bypass runtime permission and policy checks.
+`access.ts` recognizes supported class entries and identifies uncertainty. `core.ts` owns pure eligibility, slot validation, filters and assignment-only presets. Spell origins distinguish virtual compendium rows from actor-owned items. `runtime.ts` owns all document effects, the compendium cache and GM grants. `app.ts` owns display and dialogs. `main.ts` connects hooks and version guards; `settings.ts` registers configuration. UI actions cannot bypass runtime permission and policy checks.
 
 This is an independent implementation. The narrow Foundry declarations describe the methods used; passing TypeScript checks is not proof that the actual runtime implements them. Source verification and manual runtime testing remain separate evidence.
 
@@ -26,8 +26,8 @@ Requested design runners were Astra medium and Sol medium. Effective runtime mod
 
 ## Contracts and reconciliation
 
-- Source entitlement is per actor UUID and entry ID in a GM-controlled world setting. Character class alone never grants access.
-- A grant binds current tradition, class slug and category. Preparation also binds the slot layout and a positive set of wholly ordinary rank groups. New slot layouts require GM review; virtual rank discovery still updates automatically.
+- Source entitlement comes from conservative class/entry recognition or a GM-controlled world setting. Recognition requires one matching prepared entry with cantrips and rejects archetype, grant-parent, and special-entry ambiguity. Character class alone does not identify an entry.
+- A grant binds current tradition, class slug and category. Preparation also binds the slot layout and a positive set of wholly ordinary rank groups. Manually approved new slot layouts require GM review. Automatic ordinary entries follow their current layout. Cleric and Wizard ranked slots and Magus Studious Spells require whole-rank confirmation because native PF2e has no per-slot restriction marker.
 - No actor update is needed for browsing. Full compendium documents load only for details/import.
 - Imports preserve owned documents. Canonical source UUID plus entry ID prevents repeated imports in the same module client. Importing the same source into a second legitimate entry is allowed.
 - Preparation rechecks current ownership, slot shape, membership and rank. Focus, ritual and flexible ranked preparation use the native sheet.

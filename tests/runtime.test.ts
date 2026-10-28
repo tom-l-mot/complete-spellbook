@@ -169,6 +169,48 @@ function fixture() {
 }
 
 const sourceKey = (id = 'alpha') => `Compendium.synthetic.spells.Item.${id}`;
+test('automatic Druid access works for an owner without writing GM settings and preserves spent slots', async () => {
+  const f = fixture(); f.settings.delete('grants'); f.actor.class.slug = 'druid'; f.env.user.isGM = false;
+  f.entry.system.tradition = { value: 'primal' };
+  record(f.entry.system.slots).slot0 = { max: 1, value: 1, prepared: [{ id: null, expended: false }] };
+  for (const doc of f.pack.docs) record(doc.system.traits).traditions = ['primal'];
+  assert.equal(f.book.needsSetup(f.book.entry('entry')), false);
+  assert.equal((await f.book.list('entry')).length, 3);
+  await f.book.prepare('entry', sourceKey(), 1, 0);
+  assert.equal(record((prepared(f.entry) as unknown[])[0]).expended, true);
+  await f.book.savePreset('entry', 'Automatic');
+  assert.equal(f.book.presets('entry')[0]?.assignments.length, 4);
+  assert.equal(f.settings.has('grants'), false);
+  await assert.rejects(f.book.configure('entry', { fullTradition: true, extra: [], preparation: true, allowedRanks: [1] }), /Only the GM/);
+});
+test('Cleric uncertainty blocks ranked writes until the GM confirms whole ranks', async () => {
+  const f = fixture(); f.settings.delete('grants'); f.actor.class.slug = 'cleric';
+  f.entry.system.tradition = { value: 'divine' };
+  record(f.entry.system.slots).slot0 = { max: 1, value: 1, prepared: [{ id: null, expended: false }] };
+  const before = structuredClone(f.entry.system);
+  assert.equal(f.book.needsSetup(f.book.entry('entry')), true);
+  await assert.rejects(f.book.prepare('entry', null, 1, 0), /restricted|unconfirmed/);
+  assert.deepEqual(f.entry.system, before);
+  await f.book.configure('entry', { fullTradition: true, extra: [], preparation: true, allowedRanks: [0] });
+  assert.equal(f.book.needsSetup(f.book.entry('entry')), false);
+  await assert.rejects(f.book.prepare('entry', null, 1, 0), /restricted|unconfirmed/);
+  record(record(f.entry.system.slots).slot1).max = 4;
+  assert.equal(f.book.needsSetup(f.book.entry('entry')), true);
+  await assert.rejects(f.book.prepare('entry', null, 0, 0), /GM must review/);
+});
+test('known special entries override old approval and archetype traits prevent automatic access', async () => {
+  const f = fixture(); f.entry.name = 'Divine Font';
+  const before = structuredClone(f.entry.system);
+  assert.equal(f.book.grant(f.book.entry('entry')), undefined);
+  await assert.rejects(f.book.prepare('entry', null, 1, 0), /GM must review/);
+  assert.deepEqual(f.entry.system, before);
+  f.entry.name = 'Spells'; f.settings.delete('grants'); f.actor.class.slug = 'druid';
+  f.entry.system.tradition = { value: 'primal' };
+  record(f.entry.system.slots).slot0 = { max: 1, prepared: [{ id: null, expended: false }] };
+  f.actor.items.contents.push(new MemoryItem('dedication', 'feat', 'Renamed feat', { slug: 'custom', traits: { value: ['archetype'] } }));
+  assert.equal(f.book.recognition(f.book.entry('entry')).kind, 'review');
+  assert.equal(f.book.grant(f.book.entry('entry')), undefined);
+});
 function prepared(item: MemoryItem) {
   return record(record(item.system.slots).slot1).prepared;
 }

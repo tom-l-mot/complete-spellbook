@@ -96,6 +96,16 @@ test('actual application context paginates and filters synthetic spells; render 
   await Reflect.apply(showPreset, app, ['main', stale, true]);
   assert.equal(dialogs, 4);
   await assert.rejects(Reflect.apply(showPreset, app, ['main', stale, false]), /GM must review|missing/);
+  app.entryId = 'main';
+  Object.assign(foundry.applications.api, { DialogV2: { input: async ({ content }: { content: string }) => {
+    assert.ok(content.includes('name="rank1"'));
+    assert.ok(content.includes('type="checkbox"'));
+    assert.ok(!content.includes('UUID') && !content.includes('name="ranks"'));
+    assert.ok(content.includes('name="access"'));
+    return null;
+  } } });
+  const configure = Reflect.get(app, 'configure'); assert.equal(typeof configure, 'function');
+  await Reflect.apply(configure, app, []);
   const css = await readFile('styles/spellbook.css', 'utf8');
   const html = Handlebars.compile(template)(context);
   await mkdir('.audit', { recursive: true });

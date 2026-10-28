@@ -51,3 +51,11 @@ A preset failure was reproduced with crypto.randomUUID unavailable. Using Foundr
 The updated npm run check passed strict TypeScript checks, all 49 tests, the bundle build, and ZIP validation in the local build mirror. Independent review found no actionable issues. Final captured browser error logs were empty. Local detailed reports and screenshots remain in the ignored .audit folder and are linked from the Game Vault project note. Campaign exports and raw logs are not published in this repository.
 
 Player-only permissions, simultaneous editing clients, separate remote HTTP clients, and the full manual acceptance matrix remain untested. No public release or production-readiness claim follows from these checks.
+
+## Automatic setup update, 2026-10-28
+
+`npm run check` passed typechecking, all 66 tests, bundling, and ZIP validation in the local build mirror. Tests cover automatic access for six prepared classes, native handling for five spontaneous classes, ambiguous entries, archetypes, special entries, flexible preparation, Studious Spells, owner permissions, and protected-rank writes.
+
+Live checks rendered all twelve current test actors across eleven classes, including the additional Cleric. A test environment with saved grants hidden verified fresh automatic recognition without changing world settings. Cleric and Wizard ranked writes were refused until confirmation; their cantrips were available. Native casting entries refused module preparation. Prepared entries passed unchanged preset previews. Every actor's data matched its pre-check snapshot. Existing saved approvals remained usable.
+
+These checks do not establish that arbitrary custom entries are ordinary. PF2e lacks native per-slot restriction metadata, so mixed font and curriculum ranks remain a GM decision. Automatic recognition does not replace that missing information with slot-count guesses.

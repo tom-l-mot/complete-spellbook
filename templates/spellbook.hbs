@@ -5,11 +5,11 @@
     </label>
     <button type="button" data-command="native">{{localize 'CS.Native'}}</button>
     <button type="button" data-command="refresh">{{localize 'CS.Refresh'}}</button>
-    {{#if isGM}}{{#if hasEntry}}<button type="button" data-command="configure">{{localize 'CS.Configure'}}</button>{{/if}}{{/if}}
+    {{#if isGM}}{{#if canConfigure}}<button type="button" data-command="configure">{{localize 'CS.Configure'}}</button>{{/if}}{{/if}}
   </header>
   {{#unless hasEntries}}<p role="status">{{localize 'CS.NoEntries'}}</p>{{/unless}}
   <p class="cs-context">{{entryMode}} · {{access}}</p>
-  {{#if needsReview}}<p class="cs-notice" role="status">{{localize 'CS.NeedsReview'}}</p>{{/if}}
+  {{#if needsReview}}<p class="cs-notice" role="status">{{setupMessage}} {{localize 'CS.NeedsReview'}}</p>{{/if}}
   {{#if showNativeNotice}}<p class="cs-notice">{{localize 'CS.NativeNotice'}}</p>{{/if}}
   <div class="cs-filters" role="search">
     <label class="cs-search">{{localize 'CS.Search'}}<input name="search" type="search" value="{{filters.search}}" placeholder="{{localize 'CS.SearchHint'}}"></label>
@@ -63,7 +63,7 @@
       </div>{{/each}}</div>
       {{#if showPresets}}
       <h3>{{localize 'CS.Presets'}}</h3>
-      <div class="cs-toolbar"><button type="button" data-command="savePreset">{{localize 'CS.SavePreset'}}</button><button type="button" data-command="restore">{{localize 'CS.Restore'}}</button></div>
+      <div class="cs-toolbar"><button type="button" data-command="savePreset" {{#unless canSavePreset}}disabled{{/unless}}>{{localize 'CS.SavePreset'}}</button><button type="button" data-command="restore">{{localize 'CS.Restore'}}</button></div>
       {{#each presets}}<div class="cs-preset"><span>{{name}}</span><button type="button" data-command="comparePreset" data-key="{{id}}">{{localize 'CS.Compare'}}</button><button type="button" data-command="loadPreset" data-key="{{id}}">{{localize 'CS.Load'}}</button></div>{{/each}}
       {{/if}}
     </aside>{{/if}}
