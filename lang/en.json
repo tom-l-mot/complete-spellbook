@@ -1,32 +1,140 @@
 {
   "CS": {
-    "Title": "Complete Spellbook", "Entry": "Spellcasting entry", "Unified": "All entries", "Native": "Character sheet", "Refresh": "Refresh sources", "Configure": "GM entry access",
-    "NoEntries": "Add a spellcasting entry on the PF2e character sheet first.", "TraditionAccess": "GM-approved access to available tradition spells", "KnownAccess": "Existing spells only unless the GM approves access",
-    "NeedsReview": "The GM must confirm this entry's ordinary slots before using preparation here. The PF2e sheet remains available.",
-    "NativeNotice": "Use the PF2e sheet for casting, flexible collections, repertoire changes, innate uses, focus points, and special preparation rules.",
-    "Search": "Search", "SearchHint": "Name or description", "Rank": "Rank", "Tradition": "Tradition", "Trait": "Trait / legacy school", "Rarity": "Rarity", "Actions": "Actions", "Damage": "Damage type", "Category": "Category", "Status": "Status", "Sort": "Sort", "All": "All", "Spells": "spells", "Spell": "Spell", "Select": "Select", "SelectAll": "Select all available spells matching these filters, across all pages", "SelectionHelp": "Select is for importing Available spells. Added and Prepared spells are already on this character. Choose one spellcasting entry to select spells.", "NoDescription": "No description is available. Click to open the spell details.", "PresetSaved": "Preparation preset saved.", "Unprepared": "Unprepared", "Favorites": "Favorites", "Recent": "Recent",
-    "PreviousPage": "Previous page", "NextPage": "Next page", "Favorite": "Favorite", "Prepare": "Prepare", "Import": "Import", "NoResults": "No spells match these filters.",
-    "ImportAll": "Import eligible spells", "ImportFiltered": "Import filtered ranks / results", "ImportSelected": "Import selected", "CancelImport": "Stop import",
-    "Preparation": "Preparation", "Resources": "Rank (current / maximum slots)", "Empty": "Empty", "Expended": "Expended", "Clear": "Clear", "Presets": "Preparation presets", "SavePreset": "Save preset", "Restore": "Restore previous", "Compare": "Compare", "Load": "Load", "Name": "Name",
-    "Prepared": "Prepared", "Virtual": "Available", "Owned": "Added", "Signature": "Signature", "NoPrevious": "No previous preparation was saved for this entry.", "CompareAgainst": "Compare against", "Unspecified": "Not in preset",
-    "NothingToImport": "No missing eligible spells were selected.", "ImportPreview": "Preview spell import", "ImportWarning": "missing spells will be imported into this entry. Existing spells will not be overwritten. Cancel to keep the actor unchanged.", "Imported": "spells imported.", "Unavailable": "This spell is no longer available.",
-    "NoSlots": "No approved compatible slots are available. The GM can review ordinary slots in GM entry access. Flexible ranked preparation uses the PF2e sheet.",
-    "PreparationWarning": "Preparing an available spell adds only that spell. Replacing a slot keeps its current expended state. Follow your table's daily preparation rules.", "Slot": "Slot", "PresetWarning": "Compare every replacement below. Current expended states are preserved. Do not cast or edit this entry from another client while applying.", "Current": "Current", "ComparePreset": "Compare with current preparation", "LoadPreset": "Apply preparation preset", "GMOnly": "Only the GM can authorize spell access.",
-    "GMWarning": "Verify this entry's class feature and restrictions. Enable full-tradition access only for an eligible prepared list, such as Cleric divine, Druid primal, or Animist prepared divine. Never enable it for a Wizard spellbook, Witch familiar, Magus book, or apparition repertoire. Do not approve any rank containing font, curriculum or other restricted slots. Manage the entire mixed rank on the PF2e sheet.",
-    "FullTradition": "This entry legitimately has full-tradition spell access", "ExtraSources": "Explicit additional accessible spell UUIDs, one per line", "ConfirmPreparation": "I confirm every slot in each approved rank is ordinary", "AvailableRanks": "Available whole rank groups (0 means cantrips).", "AllowedRanks": "Approved wholly ordinary ranks, comma separated", "InvalidSlots": "One or more rank groups are invalid.",
+    "Title": "Complete Spellbook",
+    "Native": "Character sheet",
+    "Refresh": "Refresh sources",
+    "NoEntries": "Add a spellcasting entry on the PF2e character sheet first.",
+    "Search": "Search",
+    "SearchHint": "Name or description",
+    "Rank": "Rank",
+    "Tradition": "Tradition",
+    "Trait": "Trait / legacy school",
+    "Rarity": "Rarity",
+    "Actions": "Actions",
+    "Damage": "Damage type",
+    "Category": "Category",
+    "Status": "Status",
+    "Sort": "Sort",
+    "All": "All",
+    "Spells": "spells",
+    "Spell": "Spell",
+    "Select": "Select",
+    "SelectAll": "Select all available spells matching these filters, across all pages",
+    "SelectionHelp": "Select is for importing Available spells. Added and Prepared spells are already on this character. Choose one spellcasting entry to select spells.",
+    "NoDescription": "No description is available. Click to open the spell details.",
+    "PresetSaved": "Preparation preset saved.",
+    "Unprepared": "Unprepared",
+    "Favorites": "Favorites",
+    "Recent": "Recent",
+    "PreviousPage": "Previous page",
+    "NextPage": "Next page",
+    "Favorite": "Favorite",
+    "Prepare": "Prepare",
+    "Import": "Import",
+    "NoResults": "No spells match these filters.",
+    "ImportAll": "Import eligible spells",
+    "ImportFiltered": "Import filtered ranks / results",
+    "ImportSelected": "Import selected",
+    "CancelImport": "Stop import",
+    "Preparation": "Preparation",
+    "Resources": "Rank (current / maximum slots)",
+    "Empty": "Empty",
+    "Expended": "Expended",
+    "Clear": "Clear",
+    "Presets": "Preparation presets",
+    "SavePreset": "Save preset",
+    "Restore": "Restore previous",
+    "Compare": "Compare",
+    "Load": "Load",
+    "Name": "Name",
+    "Prepared": "Prepared",
+    "Virtual": "Available",
+    "Owned": "Added",
+    "Signature": "Signature",
+    "NoPrevious": "No previous preparation was saved for this entry.",
+    "CompareAgainst": "Compare against",
+    "Unspecified": "Not in preset",
+    "NothingToImport": "No missing eligible spells were selected.",
+    "ImportPreview": "Preview spell import",
+    "ImportWarning": "missing spells will be imported into this entry. Existing spells will not be overwritten. Cancel to keep the actor unchanged.",
+    "Imported": "spells imported.",
+    "Unavailable": "This spell is no longer available.",
+    "PreparationWarning": "Preparing an available spell adds only that spell. Replacing a slot keeps its current expended state. Follow your table's daily preparation rules.",
+    "Slot": "Slot",
+    "PresetWarning": "Compare every replacement below. Current expended states are preserved. Do not cast or edit this entry from another client while applying.",
+    "Current": "Current",
+    "ComparePreset": "Compare with current preparation",
+    "LoadPreset": "Apply preparation preset",
     "Settings": {
-      "virtual": { "Name": "Enable virtual spellbook", "Hint": "Discover permitted spells without importing them. Requires GM entry access configuration." },
-      "autoSync": { "Name": "Automatically import missing eligible spells", "Hint": "Off by default. The active elected GM imports missing spells after relevant character changes for approved full-tradition entries. Never deletes spells." },
-      "legacy": { "Name": "Include legacy spells", "Hint": "Include spells explicitly marked as not remastered in the virtual catalog. Existing actor spells remain visible." },
-      "uncommon": { "Name": "Permit uncommon tradition spells", "Hint": "GM campaign authorization for uncommon spells in approved full-tradition entries." },
-      "rare": { "Name": "Permit rare tradition spells", "Hint": "GM campaign authorization for rare spells in approved full-tradition entries." },
-      "presets": { "Name": "Enable preparation presets", "Hint": "Store assignment-only presets per character. Does not restore expended slots." },
-      "favorites": { "Name": "Enable favorites", "Hint": "Store favorite spells on each character." },
-      "import": { "Name": "Enable spell imports", "Hint": "Allow owners to import authorized spells. Required to prepare a virtual spell." },
-      "sources": { "Name": "Allowed spell compendiums", "Hint": "Comma-separated pack IDs. Defaults to pf2e.spells-srd. Normal Foundry pack permissions also apply." },
-      "cacheMinutes": { "Name": "Index cache duration", "Hint": "Cache searchable metadata. Full documents load only for details or imports. Refresh sources clears the cache." },
-      "debug": { "Name": "Debug logging", "Hint": "Log module action errors to the browser console." },
-      "defaultRarity": { "Name": "Default rarity filter", "Hint": "Display preference only. Cannot expand GM-approved access." }
-    }
+      "virtual": {
+        "Name": "Show available spells",
+        "Hint": "Find spells your character can use without adding them first. Supported class spell lists are recognized automatically."
+      },
+      "autoSync": {
+        "Name": "Automatically import missing eligible spells",
+        "Hint": "Off by default. The active elected GM imports missing spells after relevant character changes for approved full-tradition entries. Never deletes spells."
+      },
+      "legacy": {
+        "Name": "Include legacy spells",
+        "Hint": "Include spells explicitly marked as not remastered in the virtual catalog. Existing actor spells remain visible."
+      },
+      "uncommon": {
+        "Name": "Permit uncommon tradition spells",
+        "Hint": "GM campaign authorization for uncommon spells in approved full-tradition entries."
+      },
+      "rare": {
+        "Name": "Permit rare tradition spells",
+        "Hint": "GM campaign authorization for rare spells in approved full-tradition entries."
+      },
+      "presets": {
+        "Name": "Enable preparation presets",
+        "Hint": "Save prepared spell sets for each character. Loading a set does not restore used slots."
+      },
+      "favorites": {
+        "Name": "Enable favorites",
+        "Hint": "Store favorite spells on each character."
+      },
+      "import": {
+        "Name": "Enable spell imports",
+        "Hint": "Allow players to add available spells to their characters. Preparing an available spell adds it first."
+      },
+      "sources": {
+        "Name": "Allowed spell compendiums",
+        "Hint": "Comma-separated pack IDs. Defaults to pf2e.spells-srd. Normal Foundry pack permissions also apply."
+      },
+      "cacheMinutes": {
+        "Name": "Index cache duration",
+        "Hint": "Cache searchable metadata. Full documents load only for details or imports. Refresh sources clears the cache."
+      },
+      "debug": {
+        "Name": "Debug logging",
+        "Hint": "Log module action errors to the browser console."
+      },
+      "defaultRarity": {
+        "Name": "Default rarity filter",
+        "Hint": "Display preference only. Cannot expand GM-approved access."
+      }
+    },
+    "Cantrips": "Cantrips",
+    "KnownChoice": "Only spells already on this character",
+    "GMOnly": "Only the GM can change spell access.",
+    "Entry": "Spell list",
+    "NativeNotice": "Use your character sheet to cast spells and manage focus spells, spontaneous spells, or flexible spell preparation.",
+    "Unified": "All spell lists",
+    "NoSlots": "No suitable slot is ready here. Use the character sheet, or ask the GM to review Spellbook settings.",
+    "TraditionAccess": "Browse your available tradition spells",
+    "Ready": "This spell list was recognized automatically. You can use it without setup.",
+    "AccessHelp": "Use the full list only for ordinary Cleric, Druid, or Animist spells. Wizards, Witches, and Magi use spells they have learned.",
+    "SafeRanks": "Ranks you can prepare here",
+    "SpellAccess": "Which spells belong in this list?",
+    "NeedsReview": "The GM can review this in Spellbook settings. Unchecked ranks stay on the character sheet.",
+    "UnclearEntry": "This character has a spell list we cannot identify safely. The GM can choose which spells and ranks belong here.",
+    "SpecialEntry": "These spells have special rules. Manage them on the character sheet.",
+    "Configure": "Spellbook settings",
+    "KnownAccess": "Browse the spells already on your character",
+    "SpecialRanks": "Some slots may be reserved for font, school, or other special spells. The GM only needs to check the uncertain ranks. School restrictions can include cantrips.",
+    "RankHelp": "Check a rank only if every slot can hold an ordinary spell. Leave it unchecked if any slot is reserved for font, school, or other special spells. You can still manage those slots on the character sheet.",
+    "TraditionChoice": "The full available tradition list",
+    "SetupConfirmed": "This spell list is ready. Change these settings only if its spell access or special slots need an adjustment."
   }
 }

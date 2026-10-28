@@ -5,7 +5,7 @@ import Handlebars from 'handlebars';
 import { Catalog, Spellbook } from '../src/runtime.ts';
 import type { ActorDocument, Environment, ItemDocument } from '../src/runtime.ts';
 import type { Preset } from '../src/core.ts';
-import { record } from '../src/core.ts';
+import { record, slotShape } from '../src/core.ts';
 
 const language = JSON.parse(await readFile('lang/en.json', 'utf8'));
 function localize(key: string): string {
@@ -96,6 +96,31 @@ test('actual application context paginates and filters synthetic spells; render 
   await Reflect.apply(showPreset, app, ['main', stale, true]);
   assert.equal(dialogs, 4);
   await assert.rejects(Reflect.apply(showPreset, app, ['main', stale, false]), /GM must review|missing/);
+  app.entryId = 'main';
+  Object.assign(foundry.applications.api, { DialogV2: { input: async ({ content }: { content: string }) => {
+    assert.ok(content.includes('name="rank1"'));
+    assert.ok(content.includes('type="checkbox"'));
+    assert.ok(!content.includes('UUID') && !content.includes('name="ranks"'));
+    assert.ok(content.includes('name="access"'));
+    return null;
+  } } });
+  const configure = Reflect.get(app, 'configure'); assert.equal(typeof configure, 'function');
+  await Reflect.apply(configure, app, []);
+  record(record(entry.system).slots).slot0 = { max: 1, prepared: [{ id: null, expended: false }] };
+  const getSetting = env.settings.get;
+  for (const [classSlug, fullTradition] of [['cleric', false], ['wizard', true]] as const) {
+    actor.class = { slug: classSlug };
+    const grant = { actorUuid: actor.uuid, entryId: entry.id, classSlug, category: 'prepared', tradition: 'divine',
+      fullTradition, extra: [], preparation: true, allowedRanks: [0, 1], slotShape: slotShape(app.book.entry(entry.id)) };
+    if (classSlug === 'wizard') { record(record(entry.system).tradition).value = 'arcane'; grant.tradition = 'arcane'; }
+    env.settings.get = (scope, key) => key === 'grants' ? [grant] : getSetting(scope, key);
+    let saved: unknown;
+    env.settings.set = async (_scope, _key, value) => { saved = value; };
+    Object.assign(foundry.applications.api, { DialogV2: { input: async () => ({ rank0: true, rank1: true }) } });
+    await Reflect.apply(configure, app, []);
+    assert.ok(Array.isArray(saved));
+    assert.equal(record(saved[0]).fullTradition, fullTradition, 'Saving ranks must preserve the GM spell-access choice');
+  }
   const css = await readFile('styles/spellbook.css', 'utf8');
   const html = Handlebars.compile(template)(context);
   await mkdir('.audit', { recursive: true });

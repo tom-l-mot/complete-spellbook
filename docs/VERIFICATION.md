@@ -51,3 +51,15 @@ A preset failure was reproduced with crypto.randomUUID unavailable. Using Foundr
 The updated npm run check passed strict TypeScript checks, all 49 tests, the bundle build, and ZIP validation in the local build mirror. Independent review found no actionable issues. Final captured browser error logs were empty. Local detailed reports and screenshots remain in the ignored .audit folder and are linked from the Game Vault project note. Campaign exports and raw logs are not published in this repository.
 
 Player-only permissions, simultaneous editing clients, separate remote HTTP clients, and the full manual acceptance matrix remain untested. No public release or production-readiness claim follows from these checks.
+
+## Automatic setup update, 2026-10-28
+
+`npm run check` passed typechecking, all 69 tests, bundling, and ZIP validation in the local build mirror. Tests cover automatic access for six prepared classes, native handling for five spontaneous classes, ambiguous entries, archetypes, special entries, flexible preparation, Studious Spells, owner permissions, and protected-rank writes.
+
+Live checks rendered all twelve current test actors across eleven classes, including the additional Cleric. A test environment with saved grants hidden verified fresh automatic recognition without changing world settings. Cleric ranked writes were refused until confirmation. The test Wizard has Unified Magical Theory, so its ordinary preparation is automatic. Separate regression checks protect all curriculum ranks, including cantrips. Native casting entries refused module preparation. Prepared entries passed unchanged preset previews. Every actor's data matched its pre-check snapshot. Existing saved approvals remained usable.
+
+These checks do not establish that arbitrary custom entries are ordinary. PF2e lacks native per-slot restriction metadata, so mixed font and curriculum ranks remain a GM decision. Automatic recognition does not replace that missing information with slot-count guesses.
+
+Independent review found two issues before publication: school Wizard cantrips were incorrectly considered ordinary, and saving rank checkboxes could replace the GM's spell-access choice with a class default. Both were fixed. Three focused regressions failed on the reviewed pre-fix candidate and passed after repair. Wizard ranks now require confirmation unless the character has School of Unified Magical Theory. [Arcane school rules](https://2e.aonprd.com/ArcaneSchools.aspx) document both curriculum cantrip restrictions and the unrestricted school's exception. Saving rank choices preserves existing access.
+
+A follow-up review found that native flexible casting intentionally leaves ranked prepared arrays empty. Recognition now skips those unused arrays while still validating cantrips; flexible ranked preparation remains native. The real array shape and malformed cantrip shape are covered in the regression suite. All 69 checks passed again.

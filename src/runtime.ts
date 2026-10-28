@@ -1,5 +1,7 @@
 import { MODULE_ID, record, text, strings, integer, category, eligible, validGrant, duplicate, preparationError, slotShape, parsePreset, planPreset, snapshot, favoriteKey } from './core.ts';
 import type { Entry, Spell, Grant, Policy, Preset, SlotGroup } from './core.ts';
+import { recognize } from './access.ts';
+import type { Recognition } from './access.ts';
 
 export interface ItemDocument {
   id: string; uuid: string; type: string; name: string; system: unknown; sourceId?: string | null; flags?: unknown; _stats?: unknown;
@@ -113,7 +115,17 @@ export class Spellbook {
   }
   entries(): Entry[] { this.assertOwner(); return this.actor.items.contents.flatMap(i => { const e = parseEntry(i); return e ? [e] : []; }); }
   entry(id: string): Entry { const e = this.entries().find(e => e.id === id); if (!e) throw new Error('Spellcasting entry no longer exists.'); return e; }
-  grant(e: Entry): Grant | undefined {
+  recognition(e: Entry): Recognition {
+    const items = this.actor.items.contents;
+    const features = items.filter(i => i.type === 'feat').map(i => text(record(i.system).slug));
+    const ambiguous = items.some(i => i.type === 'feat' && strings(record(record(i.system).traits).value).some(t => t === 'archetype' || t === 'dedication')) ||
+      items.filter(i => i.type === 'class').length > 1 || !!text(record(record(record(this.actor.items.get(e.id)?.flags).pf2e).grantedBy).id);
+    const system = record(this.actor.items.get(e.id)?.system);
+    const special = /\b(font|curriculum|apparition|studious|archetype|dedication)\b/i.test(e.name) ||
+      !!record(system.prepared).validItems || (Array.isArray(system.rules) && system.rules.length > 0);
+    return recognize(e, this.entries(), this.actor.class?.slug ?? '', features, ambiguous, special);
+  }
+  private savedGrant(e: Entry): Grant | undefined {
     const raw = this.env.settings.get(MODULE_ID, 'grants');
     if (!Array.isArray(raw)) return undefined;
     const candidate = raw.map(record).find(g => g.actorUuid === this.actor.uuid && g.entryId === e.id);
@@ -123,6 +135,23 @@ export class Spellbook {
       classSlug: text(candidate.classSlug), fullTradition: candidate.fullTradition === true, extra: strings(candidate.extra), preparation: candidate.preparation === true,
       slotShape: text(candidate.slotShape), allowedRanks: Array.isArray(candidate.allowedRanks) ? candidate.allowedRanks.filter((r): r is number => integer(r, 0, 10) !== null) : [] };
     return validGrant(g, this.actor.uuid, this.actor.class?.slug ?? '', e) ? g : undefined;
+  }
+  grant(e: Entry): Grant | undefined {
+    const recognition = this.recognition(e);
+    if (recognition.kind === 'native') return undefined;
+    const saved = this.savedGrant(e);
+    if (saved) return saved;
+    if (recognition.kind !== 'automatic') return undefined;
+    return { actorUuid: this.actor.uuid, entryId: e.id, classSlug: this.actor.class?.slug ?? '', tradition: e.tradition,
+      category: e.category, fullTradition: recognition.fullTradition, extra: [], preparation: true,
+      slotShape: slotShape(e), allowedRanks: recognition.allowedRanks };
+  }
+  needsSetup(e: Entry): boolean {
+    const recognition = this.recognition(e);
+    if (recognition.kind === 'native') return false;
+    const saved = this.savedGrant(e);
+    if (saved && (!saved.preparation || saved.slotShape === slotShape(e))) return false;
+    return recognition.kind === 'review' || recognition.reviewRanks.length > 0 || !!saved;
   }
   policy(): Policy {
     const get = (key: string) => this.env.settings.get(MODULE_ID, key) === true;
@@ -281,6 +310,7 @@ export class Spellbook {
     return this.serial(async () => {
       if (!this.env.user.isGM) throw new Error('Only the GM can authorize spell access.');
       const e = this.entry(entryId);
+      if (this.recognition(e).kind === 'native') throw new Error('Use the character sheet for these special spells.');
       if (options.allowedRanks.some(rank => !e.slots.some(s => s.rank === rank && s.max > 0 && s.prepared.length === s.max))) throw new Error('Only complete existing rank groups may be approved.');
       if (options.fullTradition && (e.category !== 'prepared' || !['divine', 'primal', 'arcane', 'occult'].includes(e.tradition))) throw new Error('Full-tradition access requires a prepared entry with a tradition.');
       const g: Grant = { ...options, actorUuid: this.actor.uuid, entryId, classSlug: this.actor.class?.slug ?? '',

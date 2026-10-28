@@ -22,16 +22,17 @@ Browse your available spells, prepare them for the day, and save sets you can lo
    if (actor) game.modules.get("pf2e-complete-spellbook").api.open(actor);
    ```
 
-## Configure spell access
+## Set up a character
 
-PF2e does not label which class owns each spellcasting entry or which slots are restricted. The GM must configure each applicable entry once.
+Open the spellbook. It recognizes a supported class's ordinary spell list when the character has one matching prepared list with cantrips. Druid, Animist, Witch, and Magus ordinary preparation is ready automatically. Clerics can browse their tradition spells and prepare cantrips immediately. Wizards keep their learned spells, and Unified Magical Theory preparation is ready automatically.
 
-1. Select the character's ordinary Cleric divine, Druid primal, or Animist prepared divine entry and choose **GM entry access**.
-2. Enable full-tradition access only when its class feature permits it. Existing Wizard, Witch, Magus and spontaneous collections must remain known-only.
-3. Enter any specifically granted spell compendium UUIDs, one per line. Deity grants do not need blanket uncommon access.
-4. Confirm preparation and enter whole ordinary rank groups from the displayed list. For example, `0,1` approves all cantrip and rank-one slots. Approve a rank only if every slot in it is ordinary. If a group contains divine-font, curriculum or other restricted slots, leave that entire rank unapproved and manage it on the PF2e sheet. PF2e reorders occupied slots, so individual restricted slots cannot be safely isolated by position.
+Cleric font slots and Wizard school slots, including bonus cantrips, may have special rules. PF2e does not label those slots, so the GM checks any uncertain ranks once in **Spellbook settings**. Check a rank only when every slot in it is for ordinary spells. Leave mixed or special ranks unchecked and manage them on the character sheet. Magus Studious Spells also needs this check.
 
-The character now browses all permitted common tradition spells up to its available slot rank without importing them. New ranks appear as actual entry slot capacity changes. Reconfirm preparation after a slot layout change. Players cannot edit the module's world-level access grants.
+The screen uses labeled checkboxes, with no spell IDs or comma-separated numbers to enter. If multiple lists, archetypes, or custom entries make the class match unclear, it asks which spell list belongs there. Existing GM choices remain in place. A changed slot layout needs another check for a manually configured list.
+
+Clerics, Druids, and prepared Animists can browse permitted tradition spells. Wizards, Witches, and Magi keep the spells they have learned. Spontaneous, focus, innate, apparition, and flexible ranked preparation remain on the character sheet.
+
+Automatic recognition is conservative, but PF2e's generic entries cannot prove the meaning of custom slots. Review **Spellbook settings** when using a custom setup. A spell list's name or slot count is never proof that its special slots are safe.
 
 ## Browse, import and prepare
 
@@ -94,7 +95,7 @@ docs/              Architecture, manual testing and decision trail
 
 ## Known limits and production readiness
 
-- Full-tradition discovery and preparation need GM entry mapping. Slot-layout changes need preparation reapproval. This is conservative because the system does not encode enough class-specific restrictions.
+- Ambiguous spell lists and ranks with possible special slots need a GM check. Manually approved slot-layout changes need another check.
 - Animist prepared divine discovery works after approval. Existing apparition and vessel entries remain distinct. Attunement, dispersion, primary-apparition changes and gift synchronization require the PF2e sheet or existing tools.
 - Flexible ranked collection selection, learning/repertoire edits, casting, focus/innate resources, rituals, staff/item casting and special slots remain native workflows. No direct compendium casting is claimed.
 - Cross-client import races and concurrent native-sheet writes do not have a server transaction. Operate one character from one editing client during imports and preset application.
