@@ -1,0 +1,13 @@
+ts	phase	decision	why	evidence	result
+2026-10-27T00:00:00Z	frame	Create an independent local module with runtime validation explicitly pending	No existing repository or licensed running world has been established	todo.md	open
+2026-10-28T05:14:59.8653572Z	research	Pinned PF2e 8.6.1 and Foundry14; independent MIT code	No licensed comparison source reused	RESEARCH.md	VERIFIED source research
+2026-10-28T05:14:59.8653572Z	design	Select candidate A and single-update presets with positive slot approval	Entry schemas do not encode class or special-slot ownership	docs/ARCHITECTURE.md	design reviewed; runtime open
+2026-10-28T05:14:59.8653572Z	build	Use a temporary local build copy after Google Drive npm EBADF	Dependency extraction failed on workspace filesystem	README.md	local npm install passed
+2026-10-28T05:14:59.8653572Z	verification	Correct in-flight catalog revocation and native preparation fixture	Tests exposed stale permissions; pinned API preserves expended	tests/runtime.test.ts	42 tests and npm run check passed
+2026-10-28T05:14:59.8653572Z	runtime	Leave connected campaign unchanged	Foundry join page showed one user connected	docs/MANUAL_TESTING.md	live acceptance NOT RUN
+2026-10-28T05:14:59.8653572Z	audit	Initial frame row used a date-only placeholder timestamp	This row records the actual run time	docs/decisions.tsv	supersedes initial timestamp precision
+2026-10-28T05:24:27.9373965Z	review	Replace coordinate approval with whole ordinary ranks; retain favorite identities and per-entry backups	Independent review reproduced three defects on initial tree	tests/runtime.test.ts	Fixed; compaction and restore checks pass
+2026-10-28T05:24:27.9373965Z	verification	Preserve synchronization intent across debounced flag refreshes	A later refresh could erase a level-change request	tests/hooks.test.ts	48 tests and clean npm ci/check pass
+2026-10-28T05:24:27.9373965Z	release	Verify generated URLs with a synthetic repository and rebuild local manifest	No repository publication is authorized	docs/VERIFICATION.md	Local ZIP validated; hosted install NOT VERIFIED
+2026-10-28T05:28:39.4193274Z	review	Keep comparison read-only even when a preset cannot load	Second independent review reproduced blocked comparisons after layout changes	src/app.ts; tests/artifacts.test.ts	Fixed; actual application-method checks and all 48 tests pass
+2026-10-28T05:31:04.7813242Z	review	Accept bounded final correction after independent Sol high review	48 candidate tests and typecheck passed; regression fails with baseline app	tree fe960f0b408791fecd6c13e8bd3b3c96ccc9a73c	No actionable findings; live acceptance remains NOT VERIFIED

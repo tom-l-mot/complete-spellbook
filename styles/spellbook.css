@@ -1,0 +1,32 @@
+.pf2e-complete-spellbook .window-content { padding: 12px; overflow: hidden; }
+.pf2e-complete-spellbook .cs-body { display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; color: var(--color-text-primary, inherit); }
+.pf2e-complete-spellbook .cs-toolbar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.pf2e-complete-spellbook button { width: auto; min-height: 28px; }
+.pf2e-complete-spellbook label { display: flex; flex-direction: column; gap: 3px; }
+.pf2e-complete-spellbook input, .pf2e-complete-spellbook select { width: 100%; }
+.pf2e-complete-spellbook input[type=checkbox] { width: 18px; }
+.pf2e-complete-spellbook .cs-context, .pf2e-complete-spellbook p { margin: 2px 0; }
+.pf2e-complete-spellbook .cs-notice { border-inline-start: 3px solid var(--color-border-highlight, #b36c22); padding: 7px; }
+.pf2e-complete-spellbook .cs-filters { display: grid; grid-template-columns: repeat(5, minmax(90px, 1fr)); gap: 6px; }
+.pf2e-complete-spellbook .cs-search { grid-column: span 2; }
+.pf2e-complete-spellbook .cs-columns { display: flex; flex: 1; min-height: 150px; gap: 12px; }
+.pf2e-complete-spellbook .cs-library { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.pf2e-complete-spellbook .cs-scroll { overflow: auto; flex: 1; }
+.pf2e-complete-spellbook table { width: 100%; margin: 0; }
+.pf2e-complete-spellbook th { text-align: start; position: sticky; top: 0; background: var(--color-bg-option, #292a30); color: var(--color-text-light-highlight, #fff); }
+.pf2e-complete-spellbook td { padding: 5px; vertical-align: top; }
+.pf2e-complete-spellbook small { display: block; opacity: .8; }
+.pf2e-complete-spellbook .cs-spell-name { text-align: start; border: 0; background: transparent; font-weight: 600; padding: 2px; }
+.pf2e-complete-spellbook .cs-row-actions { display: flex; gap: 3px; flex-wrap: wrap; }
+.pf2e-complete-spellbook .cs-preparation { width: 270px; overflow: auto; border-inline-start: 1px solid var(--color-border-light-primary, #888); padding-inline-start: 10px; }
+.pf2e-complete-spellbook .cs-slot, .pf2e-complete-spellbook .cs-preset { display: flex; gap: 5px; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--color-border-light-primary, #888); }
+.pf2e-complete-spellbook button:focus-visible, .pf2e-complete-spellbook input:focus-visible, .pf2e-complete-spellbook select:focus-visible { outline: 2px solid var(--color-border-highlight, #b36c22); outline-offset: 2px; }
+.cs-preview { max-height: 350px; overflow: auto; }
+.pf2e-complete-spellbook .cs-select-all { flex-direction: row; align-items: center; gap: 5px; white-space: nowrap; }
+.cs-spell-tooltip { max-width: 400px; text-align: start; line-height: 1.4; }
+.sheet .spellcasting .sub-nav .cs-sheet-open { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 28px; width: 28px; height: 28px; min-height: 28px; padding: 0; margin: 0 6px 0 0; border: 1px solid #c6ad6a; border-radius: 50%; background: #171f69; color: #f5e6c8; line-height: 1; }
+.sheet .spellcasting .sub-nav .cs-sheet-open:hover, .sheet .spellcasting .sub-nav .cs-sheet-open:focus-visible { outline: 2px solid #c6ad6a; outline-offset: 2px; }
+@media (max-width: 850px) {
+  .pf2e-complete-spellbook .cs-filters { grid-template-columns: repeat(3, minmax(80px, 1fr)); }
+  .pf2e-complete-spellbook .cs-preparation { width: 220px; }
+}

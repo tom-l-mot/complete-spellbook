@@ -1,0 +1,71 @@
+<section class="cs-body" aria-label="{{localize 'CS.Title'}}">
+  <header class="cs-toolbar">
+    <label>{{localize 'CS.Entry'}}
+      <select name="entry"><option value="">{{localize 'CS.Unified'}}</option>{{#each entries}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select>
+    </label>
+    <button type="button" data-command="native">{{localize 'CS.Native'}}</button>
+    <button type="button" data-command="refresh">{{localize 'CS.Refresh'}}</button>
+    {{#if isGM}}{{#if hasEntry}}<button type="button" data-command="configure">{{localize 'CS.Configure'}}</button>{{/if}}{{/if}}
+  </header>
+  {{#unless hasEntries}}<p role="status">{{localize 'CS.NoEntries'}}</p>{{/unless}}
+  <p class="cs-context">{{entryMode}} · {{access}}</p>
+  {{#if needsReview}}<p class="cs-notice" role="status">{{localize 'CS.NeedsReview'}}</p>{{/if}}
+  {{#if showNativeNotice}}<p class="cs-notice">{{localize 'CS.NativeNotice'}}</p>{{/if}}
+  <div class="cs-filters" role="search">
+    <label class="cs-search">{{localize 'CS.Search'}}<input name="search" type="search" value="{{filters.search}}" placeholder="{{localize 'CS.SearchHint'}}"></label>
+    <label>{{localize 'CS.Rank'}}<select name="rank"><option value="">{{localize 'CS.All'}}</option>{{#each ranks}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+    <label>{{localize 'CS.Tradition'}}<select name="tradition"><option value="">{{localize 'CS.All'}}</option>{{#each traditions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+    <label>{{localize 'CS.Trait'}}<select name="trait"><option value="">{{localize 'CS.All'}}</option>{{#each traits}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+    <label>{{localize 'CS.Rarity'}}<select name="rarity"><option value="">{{localize 'CS.All'}}</option>{{#each rarities}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+    <label>{{localize 'CS.Actions'}}<select name="actions"><option value="">{{localize 'CS.All'}}</option>{{#each actions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+    <label>{{localize 'CS.Damage'}}<select name="damage"><option value="">{{localize 'CS.All'}}</option>{{#each damages}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+    <label>{{localize 'CS.Category'}}<select name="category"><option value="">{{localize 'CS.All'}}</option>{{#each categories}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+    <label>{{localize 'CS.Status'}}<select name="status"><option value="">{{localize 'CS.All'}}</option>{{#each statuses}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+    <label>{{localize 'CS.Sort'}}<select name="sort">{{#each sorts}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+  </div>
+  <div class="cs-columns">
+    <section class="cs-library" aria-label="{{localize 'CS.Spells'}}">
+      <div class="cs-toolbar">
+        <span role="status">{{total}} {{localize 'CS.Spells'}} · {{page}} / {{pages}}</span>
+        <button type="button" data-command="previousPage" {{#if prevDisabled}}disabled{{/if}} aria-label="{{localize 'CS.PreviousPage'}}">‹</button>
+        <button type="button" data-command="nextPage" {{#if nextDisabled}}disabled{{/if}} aria-label="{{localize 'CS.NextPage'}}">›</button>
+      </div>
+      <div class="cs-scroll">
+        <table><thead><tr><th scope="col"><label class="cs-select-all"><input name="selectAll" type="checkbox" aria-label="{{localize 'CS.SelectAll'}}" title="{{localize 'CS.SelectAll'}}" {{#if allSelected}}checked{{/if}} {{#if selectionDisabled}}disabled{{/if}}>{{localize 'CS.Select'}}</label></th><th scope="col">{{localize 'CS.Spell'}}</th><th scope="col">{{localize 'CS.Rank'}}</th><th scope="col">{{localize 'CS.Status'}}</th><th scope="col">{{localize 'CS.Actions'}}</th></tr></thead><tbody>
+          {{#each rows}}
+          <tr>
+            <td>{{#if selectable}}<input name="selected" type="checkbox" value="{{entryId}}|{{key}}" aria-label="{{localize 'CS.Select'}} {{name}}" {{#if checked}}checked{{/if}}>{{/if}}</td>
+            <td><button type="button" class="cs-spell-name" data-command="details" data-key="{{key}}" data-entry="{{entryId}}" data-tooltip="{{snippet}}" data-tooltip-class="cs-spell-tooltip" data-tooltip-direction="UP">{{name}}</button><small>{{entryName}} · {{category}}{{#if signature}} · {{localize 'CS.Signature'}}{{/if}}</small></td>
+            <td>{{rank}}</td><td>{{status}}</td>
+            <td class="cs-row-actions">
+              {{#if showFavorite}}<button type="button" data-command="favorite" data-key="{{key}}" aria-pressed="{{favorite}}" aria-label="{{localize 'CS.Favorite'}} {{name}}">{{#if favorite}}★{{else}}☆{{/if}}</button>{{/if}}
+              {{#if canPrepare}}<button type="button" data-command="prepare" data-key="{{key}}" data-entry="{{entryId}}">{{localize 'CS.Prepare'}}</button>{{/if}}
+              {{#if canImport}}<button type="button" data-command="importOne" data-key="{{key}}" data-entry="{{entryId}}">{{localize 'CS.Import'}}</button>{{/if}}
+            </td>
+          </tr>
+          {{else}}<tr><td colspan="5">{{localize 'CS.NoResults'}}</td></tr>{{/each}}
+        </tbody></table>
+      </div>
+      <small class="cs-selection-help">{{localize 'CS.SelectionHelp'}}</small>
+      {{#if showImport}}<footer class="cs-toolbar">
+        <button type="button" data-command="importAll">{{localize 'CS.ImportAll'}}</button>
+        <button type="button" data-command="importFiltered">{{localize 'CS.ImportFiltered'}}</button>
+        <button type="button" data-command="importSelected" {{#if noneSelected}}disabled{{/if}}>{{localize 'CS.ImportSelected'}}</button>
+        <button type="button" data-command="cancel">{{localize 'CS.CancelImport'}}</button>
+      </footer>{{/if}}
+    </section>
+    {{#if hasEntry}}<aside class="cs-preparation" aria-label="{{localize 'CS.Preparation'}}">
+      <h3>{{localize 'CS.Preparation'}} {{filled}} / {{slotCount}}</h3>
+      <p>{{localize 'CS.Resources'}} {{#each resources}}<span>{{rank}} ({{value}}/{{max}}) </span>{{/each}}</p>
+      <div class="cs-slots">{{#each slots}}<div class="cs-slot">
+        <span>{{rank}}:{{index}} · {{name}} {{#if expended}}<strong>{{localize 'CS.Expended'}}</strong>{{/if}}</span>
+        <button type="button" data-command="clear" data-rank="{{rank}}" data-index="{{index}}" {{#unless editable}}disabled{{/unless}} aria-label="{{localize 'CS.Clear'}} {{rank}}:{{index}}">{{localize 'CS.Clear'}}</button>
+      </div>{{/each}}</div>
+      {{#if showPresets}}
+      <h3>{{localize 'CS.Presets'}}</h3>
+      <div class="cs-toolbar"><button type="button" data-command="savePreset">{{localize 'CS.SavePreset'}}</button><button type="button" data-command="restore">{{localize 'CS.Restore'}}</button></div>
+      {{#each presets}}<div class="cs-preset"><span>{{name}}</span><button type="button" data-command="comparePreset" data-key="{{id}}">{{localize 'CS.Compare'}}</button><button type="button" data-command="loadPreset" data-key="{{id}}">{{localize 'CS.Load'}}</button></div>{{/each}}
+      {{/if}}
+    </aside>{{/if}}
+  </div>
+</section>
