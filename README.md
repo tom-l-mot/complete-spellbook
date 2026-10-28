@@ -24,9 +24,9 @@ Browse your available spells, prepare them for the day, and save sets you can lo
 
 ## Set up a character
 
-Open the spellbook. It recognizes a supported class's ordinary spell list when the character has one matching prepared list with cantrips. Druid, Animist, Witch, and Magus ordinary preparation is ready automatically. Clerics and Wizards can browse the right spells and prepare cantrips immediately.
+Open the spellbook. It recognizes a supported class's ordinary spell list when the character has one matching prepared list with cantrips. Druid, Animist, Witch, and Magus ordinary preparation is ready automatically. Clerics can browse their tradition spells and prepare cantrips immediately. Wizards keep their learned spells, and Unified Magical Theory preparation is ready automatically.
 
-Cleric font slots and Wizard school slots may have special rules. PF2e does not label those slots, so the GM checks any uncertain ranks once in **Spellbook settings**. Check a rank only when every slot in it is for ordinary spells. Leave mixed or special ranks unchecked and manage them on the character sheet. Magus Studious Spells also needs this check.
+Cleric font slots and Wizard school slots, including bonus cantrips, may have special rules. PF2e does not label those slots, so the GM checks any uncertain ranks once in **Spellbook settings**. Check a rank only when every slot in it is for ordinary spells. Leave mixed or special ranks unchecked and manage them on the character sheet. Magus Studious Spells also needs this check.
 
 The screen uses labeled checkboxes, with no spell IDs or comma-separated numbers to enter. If multiple lists, archetypes, or custom entries make the class match unclear, it asks which spell list belongs there. Existing GM choices remain in place. A changed slot layout needs another check for a manually configured list.
 

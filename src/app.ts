@@ -217,7 +217,7 @@ export class CompleteSpellbook extends foundry.applications.api.HandlebarsApplic
     const e = this.book.entry(this.entryId), g = this.book.grant(e), recognition = this.book.recognition(e);
     if (recognition.kind === 'native') return;
     const ranks = e.slots.filter(s => s.max > 0 && s.prepared.length === s.max && (!e.flexible || s.rank === 0)).map(s => s.rank);
-    const full = recognition.kind === 'automatic' ? recognition.fullTradition : g?.fullTradition ?? false;
+    const full = g?.fullTradition ?? (recognition.kind === 'automatic' && recognition.fullTradition);
     const content = `<p><strong>${escapeHTML(e.name)}</strong></p><p>${t(this.book.needsSetup(e) ? recognition.reason : 'SetupConfirmed')}</p>` +
       (recognition.kind === 'review' ? `<label>${t('SpellAccess')}<select name="access"><option value="known" ${!full ? 'selected' : ''}>${t('KnownChoice')}</option><option value="tradition" ${full ? 'selected' : ''}>${t('TraditionChoice')}</option></select></label><p>${t('AccessHelp')}</p>` : `<p>${t(full ? 'TraditionAccess' : 'KnownAccess')}</p>`) +
       `<fieldset><legend>${t('SafeRanks')}</legend><p>${t('RankHelp')}</p>${ranks.map(rank => `<label style="display:flex;align-items:center;gap:0.5rem"><input type="checkbox" name="rank${rank}" ${g?.preparation && g.allowedRanks.includes(rank) && g.slotShape === slotShape(e) ? 'checked' : ''}>${rank === 0 ? t('Cantrips') : `${t('Rank')} ${rank}`}</label>`).join('')}</fieldset>`;

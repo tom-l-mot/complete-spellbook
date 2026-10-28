@@ -211,6 +211,13 @@ test('known special entries override old approval and archetype traits prevent a
   assert.equal(f.book.recognition(f.book.entry('entry')).kind, 'review');
   assert.equal(f.book.grant(f.book.entry('entry')), undefined);
 });
+test('Wizard curriculum cantrips reject writes before changing a slot', async () => {
+  const f = fixture(); f.settings.delete('grants');
+  record(f.entry.system.slots).slot0 = { max: 6, value: 6, prepared: Array.from({ length: 6 }, () => ({ id: null, expended: false })) };
+  const before = structuredClone(f.entry.system);
+  await assert.rejects(f.book.prepare('entry', null, 0, 5), /restricted|unconfirmed/);
+  assert.deepEqual(f.entry.system, before);
+});
 function prepared(item: MemoryItem) {
   return record(record(item.system.slots).slot1).prepared;
 }

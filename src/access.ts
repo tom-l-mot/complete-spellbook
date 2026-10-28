@@ -19,10 +19,12 @@ export function recognize(entry: Entry, entries: Entry[], classSlug: string, fea
   if (!rule || ambiguous || !['arcane', 'divine', 'occult', 'primal'].includes(entry.tradition) || candidates.length !== 1 || candidates[0]?.id !== entry.id) {
     return { kind: 'review', reason: 'UnclearEntry' };
   }
+  if (entry.slots.some(s => s.max > 0 && s.prepared.length !== s.max)) return { kind: 'review', reason: 'UnclearEntry' };
   // PF2e has no per-slot restriction marker; counts cannot prove a font or curriculum rank is ordinary.
-  const uncertainRanked = classSlug === 'cleric' || classSlug === 'wizard' || (classSlug === 'magus' && features.includes('studious-spells'));
+  const uncertainWizard = classSlug === 'wizard' && !features.includes('school-of-unified-magical-theory');
+  const uncertainRanked = classSlug === 'cleric' || (classSlug === 'magus' && features.includes('studious-spells'));
   const ranks = entry.slots.filter(s => s.max > 0 && s.prepared.length === s.max).map(s => s.rank);
-  const allowedRanks = ranks.filter(rank => rank === 0 || (!entry.flexible && !uncertainRanked));
-  const reviewRanks = entry.flexible ? [] : ranks.filter(rank => !allowedRanks.includes(rank));
+  const allowedRanks = ranks.filter(rank => !uncertainWizard && (rank === 0 || (!entry.flexible && !uncertainRanked)));
+  const reviewRanks = ranks.filter(rank => (!entry.flexible || rank === 0) && !allowedRanks.includes(rank));
   return { kind: 'automatic', fullTradition: rule.full, allowedRanks, reviewRanks, reason: reviewRanks.length ? 'SpecialRanks' : 'Ready' };
 }

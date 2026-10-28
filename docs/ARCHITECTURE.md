@@ -27,7 +27,7 @@ Requested design runners were Astra medium and Sol medium. Effective runtime mod
 ## Contracts and reconciliation
 
 - Source entitlement comes from conservative class/entry recognition or a GM-controlled world setting. Recognition requires one matching prepared entry with cantrips and rejects archetype, grant-parent, and special-entry ambiguity. Character class alone does not identify an entry.
-- A grant binds current tradition, class slug and category. Preparation also binds the slot layout and a positive set of wholly ordinary rank groups. Manually approved new slot layouts require GM review. Automatic ordinary entries follow their current layout. Cleric and Wizard ranked slots and Magus Studious Spells require whole-rank confirmation because native PF2e has no per-slot restriction marker.
+- A grant binds current tradition, class slug and category. Preparation also binds the slot layout and a positive set of wholly ordinary rank groups. Manually approved new slot layouts require GM review. Automatic ordinary entries follow their current layout. Cleric ranked slots, all Wizard curriculum ranks including cantrips, and Magus Studious Spells require whole-rank confirmation because native PF2e has no per-slot restriction marker.
 - No actor update is needed for browsing. Full compendium documents load only for details/import.
 - Imports preserve owned documents. Canonical source UUID plus entry ID prevents repeated imports in the same module client. Importing the same source into a second legitimate entry is allowed.
 - Preparation rechecks current ownership, slot shape, membership and rank. Focus, ritual and flexible ranked preparation use the native sheet.

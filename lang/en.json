@@ -132,7 +132,7 @@
     "SpecialEntry": "These spells have special rules. Manage them on the character sheet.",
     "Configure": "Spellbook settings",
     "KnownAccess": "Browse the spells already on your character",
-    "SpecialRanks": "Some slots may be reserved for spells such as Heal, Harm, or school spells. Cantrips are ready; the GM only needs to check the uncertain ranks.",
+    "SpecialRanks": "Some slots may be reserved for font, school, or other special spells. The GM only needs to check the uncertain ranks. School restrictions can include cantrips.",
     "RankHelp": "Check a rank only if every slot can hold an ordinary spell. Leave it unchecked if any slot is reserved for font, school, or other special spells. You can still manage those slots on the character sheet.",
     "TraditionChoice": "The full available tradition list",
     "SetupConfirmed": "This spell list is ready. Change these settings only if its spell access or special slots need an adjustment."
