@@ -25,7 +25,7 @@ Rank view groups focus spells, cantrips, and ranked spells across casting entrie
 
 Browse available spells with search and filters, prepare individual spells, or use the import buttons below the list. The preparation panel keeps **Compare**, **Load**, **Save over**, and **Delete** together for each saved preset.
 
-![Complete Spellbook browser with spell filters, preparation slots, preset actions, and import controls](docs/screenshots/spell-browser-presets.png)
+![Complete Spellbook browser with spell filters, preparation slots, preset actions, and import controls](docs/screenshots/spell-browser-presets.jpg)
 
 ### Automatic imports
 
