@@ -64,7 +64,7 @@
       {{#if showPresets}}
       <h3>{{localize 'CS.Presets'}}</h3>
       <div class="cs-toolbar"><button type="button" data-command="savePreset" {{#unless canSavePreset}}disabled{{/unless}}>{{localize 'CS.SavePreset'}}</button><button type="button" data-command="restore">{{localize 'CS.Restore'}}</button></div>
-      {{#each presets}}<div class="cs-preset"><span>{{name}}</span><button type="button" data-command="comparePreset" data-key="{{id}}">{{localize 'CS.Compare'}}</button><button type="button" data-command="loadPreset" data-key="{{id}}">{{localize 'CS.Load'}}</button></div>{{/each}}
+      {{#each presets}}<div class="cs-preset"><span>{{name}}</span><button type="button" data-command="comparePreset" data-key="{{id}}" title="{{localize 'CS.CompareHelp'}}">{{localize 'CS.Compare'}}</button><button type="button" data-command="loadPreset" data-key="{{id}}">{{localize 'CS.Load'}}</button><button type="button" data-command="overwritePreset" data-key="{{id}}" {{#unless ../canSavePreset}}disabled{{/unless}}>{{localize 'CS.SaveOver'}}</button><button type="button" data-command="deletePreset" data-key="{{id}}">{{localize 'CS.DeletePreset'}}</button></div>{{/each}}
       {{/if}}
     </aside>{{/if}}
   </div>

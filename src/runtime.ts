@@ -255,6 +255,35 @@ export class Spellbook {
       await this.actor.setFlag(MODULE_ID, 'presets', [...all, p]);
     });
   }
+  private presetTarget(entryId: string, expected: Preset) {
+    const target = parsePreset(expected);
+    if (target.entryId !== entryId) throw new Error('Preset belongs to a different entry.');
+    const raw = this.actor.getFlag(MODULE_ID, 'presets');
+    const all = Array.isArray(raw) ? raw : [];
+    const matches = all.flatMap((value, index) => record(value).id === target.id ? [index] : []);
+    const index = matches[0];
+    if (matches.length !== 1 || index === undefined) throw new Error('Preset target is missing or ambiguous. Refresh and try again.');
+    const current = parsePreset(all[index]);
+    if (JSON.stringify(current) !== JSON.stringify(target)) throw new Error('Preset changed. Refresh and try again.');
+    return { all, index, current };
+  }
+  overwritePreset(entryId: string, expected: Preset): Promise<void> {
+    return this.serial(async () => {
+      this.assertPresets();
+      const { all, index, current } = this.presetTarget(entryId, expected);
+      const e = this.entry(entryId), saved = snapshot(e, this.grant(e), current.name, current.id);
+      if (!saved.assignments.length) throw new Error('No approved standard preparation slots are available.');
+      await this.actor.setFlag(MODULE_ID, 'presets', all.map((value, position) => position === index
+        ? { ...record(value), assignments: saved.assignments } : value));
+    });
+  }
+  deletePreset(entryId: string, expected: Preset): Promise<void> {
+    return this.serial(async () => {
+      this.assertPresets(); this.entry(entryId);
+      const { all, index } = this.presetTarget(entryId, expected);
+      await this.actor.setFlag(MODULE_ID, 'presets', all.filter((_value, position) => position !== index));
+    });
+  }
   fingerprint(entryId: string): string {
     const e = this.entry(entryId);
     return JSON.stringify([e, this.grant(e), ownedSpells(this.actor).filter(s => s.origin.kind === 'owned' && s.origin.entryId === entryId)]);

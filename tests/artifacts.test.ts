@@ -121,6 +121,64 @@ test('actual application context paginates and filters synthetic spells; render 
     assert.ok(Array.isArray(saved));
     assert.equal(record(saved[0]).fullTradition, fullTradition, 'Saving ranks must preserve the GM spell-access choice');
   }
+  const overwriteTarget = { ...stale, name: '<Combat & travel>' };
+  let presetFlags = [overwriteTarget, another], overwriteWrites = 0, notices = 0;
+  actor.getFlag = (_scope, key) => key === 'presets' ? presetFlags : [];
+  actor.setFlag = async (_scope, key, value) => {
+    assert.equal(key, 'presets'); assert.ok(Array.isArray(value));
+    presetFlags = value; overwriteWrites++;
+  };
+  Object.assign(globalThis, { ui: { notifications: { info: () => { notices++; } } } });
+  const command = Reflect.get(app, 'command'); assert.equal(typeof command, 'function');
+  const overwriteButton = { dataset: { command: 'overwritePreset', key: stale.id } };
+  for (const confirmed of [false, null, true]) {
+    Object.assign(foundry.applications.api, { DialogV2: { confirm: async ({ content }: { content: string }) => {
+      assert.ok(content.includes('&lt;Combat &amp; travel&gt;'));
+      assert.ok(!content.includes('<Combat & travel>'));
+      return confirmed;
+    } } });
+    await Reflect.apply(command, app, [overwriteButton]);
+    assert.equal(overwriteWrites, confirmed ? 1 : 0);
+  }
+  assert.equal(notices, 1);
+  assert.equal(presetFlags[0]?.id, overwriteTarget.id);
+  assert.equal(presetFlags[0]?.name, overwriteTarget.name);
+  assert.deepEqual(presetFlags[1], another);
+  Object.assign(foundry.applications.api, { DialogV2: { confirm: async () => {
+    presetFlags[0] = { ...overwriteTarget, name: 'Changed while confirming' }; return true;
+  } } });
+  await assert.rejects(Reflect.apply(command, app, [overwriteButton]), /changed/);
+  assert.equal(overwriteWrites, 1);
+  const deleteTarget = { ...overwriteTarget, assignments: [] };
+  presetFlags = [deleteTarget, another];
+  const deleteButton = { dataset: { command: 'deletePreset', key: deleteTarget.id } };
+  for (const confirmed of [false, null, true]) {
+    Object.assign(foundry.applications.api, { DialogV2: { confirm: async ({ content, rejectClose, window }: { content: string; rejectClose: boolean; window: { title: string } }) => {
+      assert.equal(rejectClose, false);
+      assert.equal(window.title, 'Delete');
+      assert.ok(content.includes('&lt;Combat &amp; travel&gt;'));
+      assert.ok(!content.includes('<Combat & travel>'));
+      assert.ok(content.includes('Only this saved preset will be removed. Current preparation stays unchanged.'));
+      return confirmed;
+    } } });
+    await Reflect.apply(command, app, [deleteButton]);
+    assert.equal(overwriteWrites, confirmed ? 2 : 1);
+    assert.deepEqual(presetFlags, confirmed ? [another] : [deleteTarget, another]);
+  }
+  assert.equal(notices, 2);
+  presetFlags = [deleteTarget, another];
+  Object.assign(foundry.applications.api, { DialogV2: { confirm: async () => {
+    presetFlags[0] = { ...deleteTarget, name: 'Changed while confirming' }; return true;
+  } } });
+  await assert.rejects(Reflect.apply(command, app, [deleteButton]), /changed/);
+  assert.equal(overwriteWrites, 2);
+  const presetHtml = (enabled: boolean) => Handlebars.compile(template)({ hasEntry: true, showPresets: true,
+    canSavePreset: enabled, presets: [overwriteTarget] });
+  assert.match(presetHtml(false), /data-command="overwritePreset"[^>]*disabled/);
+  assert.doesNotMatch(presetHtml(true), /data-command="overwritePreset"[^>]*disabled/);
+  assert.doesNotMatch(presetHtml(false), /data-command="deletePreset"[^>]*disabled/);
+  assert.deepEqual([...presetHtml(false).matchAll(/data-command="(comparePreset|loadPreset|overwritePreset|deletePreset)"/g)].map(match => match[1]),
+    ['comparePreset', 'loadPreset', 'overwritePreset', 'deletePreset']);
   const css = await readFile('styles/spellbook.css', 'utf8');
   const html = Handlebars.compile(template)(context);
   await mkdir('.audit', { recursive: true });

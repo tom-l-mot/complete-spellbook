@@ -47,7 +47,7 @@ Also exercise Bard, Oracle, Psychic, Summoner, flexible prepared casting, custom
 ## Preparation and presets
 
 1. Mark one standard slot expended and another unexpended through PF2e. Prepare/replace/clear both through this module. Their expended flags must remain unchanged.
-2. Save Exploration and Combat presets for each entry. Close the browser and rejoin; verify persistence. Compare each against current preparation before loading. Confirm missing spell IDs refuse the entire load.
+2. Save Exploration and Combat presets for each entry. Load Exploration, adjust slots, and use Save over on Exploration. Cancel once and verify no change, then confirm and verify its name/ID and other presets remain intact. Check the 50-preset limit allows overwriting but refuses a new preset. Close the browser and rejoin; verify persistence. Compare each against current preparation before loading. Confirm missing spell IDs refuse the entire load. Delete Exploration: cancel once and verify no change, then confirm and verify only Exploration disappears, including after reload. Current preparation, resources, Combat, and Restore previous must remain unchanged. Repeat deletion after removing slot approval; Delete remains available while Save over is disabled.
 3. Apply a preset while some slots are expended. Compare all resource values and the number of expended slots before/after. PF2e may reorder occupied slots; expended flags must remain attached to their slot records through this normalization. Restore previous and repeat the comparison. Apply presets on two entries, then restore each entry independently.
 4. Change a slot, spell or grant after preview but before confirmation. Application must refuse with a stale-preview message.
 5. Add a new rank through actual level advancement. Browse should reflect it automatically. Preparation must request GM review of the changed layout. Existing spells remain intact. Changing class/tradition/category invalidates access.
@@ -62,3 +62,16 @@ Also exercise Bard, Oracle, Psychic, Summoner, flexible prepared casting, custom
 4. Publish a test GitHub release after authorization. Install into a clean test world through the real manifest URL. Confirm the ZIP URL, updates and all packaged paths work.
 
 Record date, versions, character exports, actions, expected/actual outcomes, screenshots and console logs. Only after the matrix passes should the manifest gain a verified runtime version and wider distribution be considered.
+
+## Native known spell sorting
+
+Use a mixed-entry test character with prepared duplicate slots, a cantrip, heightened spontaneous rows, innate uses, and focus spells. Save the actor data before testing.
+
+1. Click **Sort spells**. Check focus first, cantrips next, ordinal rank headings, source subheaders, alphabetic order inside each source, and repeated occurrences. Verify native resources, empty slots, configuration controls and the create-entry button are hidden. Switch to **Casting type** and **Name** and check global order.
+2. Cast or intercept a cast in each entry type. Check the native entry ID, cast rank, and prepared slot index. Check summary expansion, signature toggles, expended toggles, innate resets, and focus spell casting. Resource configuration returns in Default view.
+3. Switch to **Default view**, then sort again several times. Check that the same native rows, inputs, empty slots, and resource nodes return to their original positions and original hidden states.
+4. Re-render the sheet and check the saved mode. Check two users and two actors independently. Disable client storage and check that sorting and restoration still work.
+5. Try dragging and dropping while sorted. Check that both are blocked. Restore **Default view** and check native drag behavior.
+6. Check narrow widths, keyboard controls, and both sheet themes. Compare actor data before and after view-only changes. Test a malformed spell row and check that the entire panel stays native.
+
+Automated pure ordering tests run with `npm test`. Bundle `tests/spell-sort.dom.mjs` with esbuild and run its exported `runSpellSortDomChecks()` in a browser with Foundry globals to check native row restoration, malformed DOM, and duplicate mounting. Live native actions and appearance require these checks in Foundry.

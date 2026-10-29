@@ -43,9 +43,17 @@ Automatic recognition is conservative, but PF2e's generic entries cannot prove t
 - **Import eligible spells** previews every missing eligible spell. **Import filtered ranks / results** applies current filters; **Import selected** uses checked rows. The checkbox beside **Select** selects all available spells matching your filters, across every page. Confirmation is required before import starts. **Stop import** stops between document writes. Completed imports remain intact and a retry skips them.
 - Existing owned spell documents are never overwritten or deleted. Identical sources in different entries remain separate, because PF2e associates each owned spell with one entry.
 
+## Sort the character sheet's known spells
+
+On **Spellcasting**, click **Sort spells** to combine native known spell rows across entries. Choose **Rank**, **Casting type**, or **Name**. Rank view shows focus spells, then cantrips, then ordinal rank headings with source entry groups alphabetized internally. Casting type groups prepared, spontaneous, innate, and focus spells. Source subheaders identify each entry, including repeated prepared slots. Name view stays alphabetical across all entries. Source subheaders retain cast rank in Casting type and Name views.
+
+Sorted views hide native entry controls, resource configuration, empty slots, and the create-entry button. Use **Default view** to restore the original layout or drag spells and entries. The view preference stays in this browser for this user and character. Sorting does not write actor data. If the native layout is unsupported, the module leaves it unchanged.
+
 ## Preparation presets
 
 Save the approved slots in the selected entry as a named preset, such as Combat or Exploration. Presets persist as character flags. Compare a preset against current preparation or another saved preset without changing slots. Loading also shows a comparison against the current preparation before confirmation.
+
+**Load**, adjust preparation slots, then **Save over** the same preset to edit it. Save over confirms the named target, keeps its name and ID, and replaces only its approved assignments. Other presets remain unchanged, and overwriting works when the character already has 50 presets. **Delete** confirms the named preset and removes only that saved preset; current preparation and the previous preparation backup stay unchanged. Delete also works when current preparation slots are not approved.
 
 Loading validates every target and spell, saves previous assignments separately per entry, then writes all affected ranks in one entry update while preserving expended flags. **Restore previous** offers the same preview and validation. A missing spell, changed entry or unapproved slot refuses the load. Presets do not perform daily rest or restore resources. Avoid simultaneous edits or casting from another client while applying a preset.
 

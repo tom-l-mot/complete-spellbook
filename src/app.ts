@@ -161,6 +161,20 @@ export class CompleteSpellbook extends foundry.applications.api.HandlebarsApplic
       const result = await foundry.applications.api.DialogV2.input({ window: { title: t('SavePreset') }, content: `<label>${t('Name')}<input name="name" maxlength="80" required></label>` });
       if (result) { await this.book.savePreset(entry, text(result.name)); ui.notifications.info(t('PresetSaved')); } return;
     }
+    if (command === 'overwritePreset' || command === 'deletePreset') {
+      const targets = this.book.presets(entry).filter(p => p.id === key);
+      const target = targets[0];
+      if (targets.length !== 1 || !target) throw new Error(t('Unavailable'));
+      const deleting = command === 'deletePreset';
+      const confirmed = await foundry.applications.api.DialogV2.confirm({ window: { title: t(deleting ? 'DeletePreset' : 'SaveOver') }, rejectClose: false,
+        content: `<p>${t(deleting ? 'DeletePresetWarning' : 'SaveOverWarning')} <strong>${escapeHTML(target.name)}</strong>?</p>${deleting ? `<p>${t('DeletePresetHelp')}</p>` : ''}` });
+      if (confirmed) {
+        if (deleting) await this.book.deletePreset(entry, target);
+        else await this.book.overwritePreset(entry, target);
+        ui.notifications.info(t(deleting ? 'PresetDeleted' : 'PresetSaved'));
+      }
+      return;
+    }
     if (command === 'loadPreset' || command === 'comparePreset' || command === 'restore') {
       const raw = command === 'restore' ? this.book.previous(entry) : this.book.presets(entry).find(p => p.id === key);
       if (!raw) throw new Error(t('NoPrevious'));
