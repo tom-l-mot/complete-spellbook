@@ -4,6 +4,7 @@ import type { ActorDocument } from './runtime.ts';
 import type { SheetApplication, ItemHookDocument } from './foundry.d.ts';
 import { CompleteSpellbook, openApps } from './app.ts';
 import { registerSettings } from './settings.ts';
+import { installSpellSort } from './spell-sort.ts';
 
 export function open(actor: ActorDocument): CompleteSpellbook {
   const existing = [...openApps].find(app => app.book.actor.uuid === actor.uuid);
@@ -43,7 +44,9 @@ Hooks.once('ready', () => {
   Hooks.on('renderActorSheet', (sheet: SheetApplication, html: HTMLElement | { 0?: HTMLElement }) => {
     const actor = sheet.actor ?? sheet.document;
     if (!actor?.isOwner || actor.type !== 'character') return;
-    const root = html instanceof HTMLElement ? html : html[0]; if (!root || root.querySelector('[data-complete-spellbook]')) return;
+    const root = html instanceof HTMLElement ? html : html[0]; if (!root) return;
+    installSpellSort(root, actor.uuid);
+    if (root.querySelector('[data-complete-spellbook]')) return;
     const knownSpells = root.querySelector('.spellcasting .sub-nav [data-tab="known-spells"]'); if (!knownSpells) return;
     const button = document.createElement('button'); button.type = 'button'; button.dataset.completeSpellbook = 'true';
     button.className = 'cs-sheet-open'; button.title = game.i18n.localize('CS.Title'); button.setAttribute('aria-label', button.title);

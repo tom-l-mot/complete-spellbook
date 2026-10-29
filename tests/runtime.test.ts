@@ -498,3 +498,151 @@ test('saving and restoring presets works without secure-context randomUUID', asy
     Reflect.set(crypto, 'randomUUID', original);
   }
 });
+
+
+test('save over keeps preset identity and other raw entries at the 50 preset limit', async () => {
+  const f = fixture();
+  await f.book.savePreset('entry', 'Combat');
+  const target = f.book.presets('entry')[0]; assert.ok(target);
+  const other = { ...target, id: 'other', entryId: 'other-entry' };
+  const malformed = { broken: ['keep', null] };
+  const all = [target, other, malformed, ...Array.from({ length: 47 }, (_, i) => ({ malformed: i }))];
+  f.actor.flags.set('presets', structuredClone(all));
+  await f.book.prepare('entry', sourceKey(), 1, 0);
+  const beforeSlots = structuredClone(f.entry.system.slots);
+  await assert.rejects(f.book.savePreset('entry', 'Extra'), /50 presets/);
+  await f.book.overwritePreset('entry', target);
+  const saved = f.actor.flags.get('presets'); assert.ok(Array.isArray(saved));
+  assert.equal(saved.length, 50);
+  assert.deepEqual(saved.slice(1), all.slice(1));
+  assert.deepEqual(saved[0], { ...target, assignments: [
+    { rank: 1, index: 0, spellId: 'owned-1' }, { rank: 1, index: 1, spellId: null }, { rank: 1, index: 2, spellId: null }
+  ] });
+  assert.deepEqual(f.entry.system.slots, beforeSlots);
+  assert.deepEqual(f.entry.updates, []);
+});
+
+test('save over rejects missing, stale, mismatched, malformed and ambiguous targets without writes', async () => {
+  const f = fixture();
+  await f.book.savePreset('entry', 'Exploration');
+  const target = f.book.presets('entry')[0]; assert.ok(target);
+  const cases = [
+    { raw: [], expected: target, error: /missing/ },
+    { raw: [{ ...target, name: 'Changed' }], expected: target, error: /changed/ },
+    { raw: [target], expected: { ...target, entryId: 'another' }, error: /different entry/ },
+    { raw: [{ ...target, assignments: 'broken' }], expected: target, error: /Invalid/ },
+    { raw: [target, { id: target.id, broken: true }], expected: target, error: /ambiguous/ },
+    { raw: [{ ...target, entryId: 'another' }], expected: target, error: /changed/ },
+  ];
+  let writes = 0; f.actor.beforeFlag = async () => { writes++; };
+  for (const { raw, expected, error } of cases) {
+    f.actor.flags.set('presets', structuredClone(raw));
+    await assert.rejects(f.book.overwritePreset('entry', expected), error);
+    assert.deepEqual(f.actor.flags.get('presets'), raw);
+  }
+  assert.equal(writes, 0);
+});
+
+test('save over rechecks ownership, settings and approved ranks before writing', async () => {
+  const f = fixture();
+  await f.book.savePreset('entry', 'Combat');
+  const target = f.book.presets('entry')[0]; assert.ok(target);
+  let writes = 0; f.actor.beforeFlag = async () => { writes++; };
+  f.actor.isOwner = false;
+  await assert.rejects(f.book.overwritePreset('entry', target), /ownership/);
+  f.actor.isOwner = true; f.settings.set('presets', false);
+  await assert.rejects(f.book.overwritePreset('entry', target), /disabled/);
+  f.settings.set('presets', true); f.settings.set('grants', []);
+  await assert.rejects(f.book.overwritePreset('entry', target), /No approved/);
+  assert.equal(writes, 0);
+  assert.deepEqual(f.book.presets('entry'), [target]);
+});
+
+test('queued save over rejects a target replaced by an earlier queued operation', async () => {
+  const f = fixture();
+  await f.book.savePreset('entry', 'Combat');
+  const target = f.book.presets('entry')[0]; assert.ok(target);
+  const preparing = f.book.prepare('entry', sourceKey(), 1, 0);
+  const first = f.book.overwritePreset('entry', target);
+  const second = f.book.overwritePreset('entry', target);
+  await preparing; await first;
+  await assert.rejects(second, /changed/);
+  assert.equal(f.book.presets('entry')[0]?.assignments[0]?.spellId, 'owned-1');
+});
+
+
+test('delete removes only the saved target without approved slots or touching preparation and backups', async () => {
+  const f = fixture();
+  await f.book.savePreset('entry', 'Combat');
+  const target = f.book.presets('entry')[0]; assert.ok(target);
+  const others = [{ ...target, id: 'other', entryId: 'other-entry' }, { broken: ['keep', null] }, null];
+  f.actor.flags.set('presets', [others[0], target, ...others.slice(1)]);
+  f.actor.flags.set('previousPreparations', { entry: target, other: { keep: true } });
+  f.actor.flags.set('favorites', ['keep']);
+  const beforeFlags = structuredClone(f.actor.flags), beforeSystem = structuredClone(f.entry.system);
+  f.settings.set('grants', []);
+  let writes = 0; f.actor.beforeFlag = async () => { writes++; };
+  await f.book.deletePreset('entry', target);
+  assert.equal(writes, 1);
+  beforeFlags.set('presets', others);
+  assert.deepEqual(f.actor.flags, beforeFlags);
+  assert.deepEqual(f.entry.system, beforeSystem);
+  assert.deepEqual(f.entry.updates, []);
+  assert.deepEqual(f.actor.created, []);
+});
+
+test('delete refuses missing, changed, mismatched, invalid and ambiguous targets without writes', async () => {
+  const f = fixture();
+  await f.book.savePreset('entry', 'Exploration');
+  const target = f.book.presets('entry')[0]; assert.ok(target);
+  const cases = [
+    { raw: [], expected: target, error: /missing/ },
+    { raw: [{ ...target, name: 'Changed' }], expected: target, error: /changed/ },
+    { raw: [{ ...target, assignments: [] }], expected: target, error: /changed/ },
+    { raw: [target], expected: { ...target, entryId: 'another' }, error: /different entry/ },
+    { raw: [{ ...target, assignments: 'broken' }], expected: target, error: /Invalid/ },
+    { raw: [target, { id: target.id, broken: true }], expected: target, error: /ambiguous/ },
+    { raw: [{ ...target, entryId: 'another' }], expected: target, error: /changed/ },
+  ];
+  let writes = 0; f.actor.beforeFlag = async () => { writes++; };
+  for (const { raw, expected, error } of cases) {
+    f.actor.flags.set('presets', structuredClone(raw));
+    await assert.rejects(f.book.deletePreset('entry', expected), error);
+    assert.deepEqual(f.actor.flags.get('presets'), raw);
+  }
+  assert.equal(writes, 0);
+});
+
+test('delete rechecks ownership, settings and entry existence before writing', async () => {
+  const f = fixture();
+  await f.book.savePreset('entry', 'Combat');
+  const target = f.book.presets('entry')[0]; assert.ok(target);
+  let writes = 0; f.actor.beforeFlag = async () => { writes++; };
+  f.actor.isOwner = false;
+  await assert.rejects(f.book.deletePreset('entry', target), /ownership/);
+  f.actor.isOwner = true; f.settings.set('presets', false);
+  await assert.rejects(f.book.deletePreset('entry', target), /disabled/);
+  f.settings.set('presets', true); f.actor.items.contents = [];
+  await assert.rejects(f.book.deletePreset('entry', target), /no longer exists/);
+  assert.equal(writes, 0);
+  assert.deepEqual(f.actor.flags.get('presets'), [target]);
+});
+
+test('queued delete revalidates after earlier preset mutations and preserves a queued save', async () => {
+  const f = fixture();
+  await f.book.savePreset('entry', 'Combat');
+  const target = f.book.presets('entry')[0]; assert.ok(target);
+  const preparing = f.book.prepare('entry', sourceKey(), 1, 0);
+  const overwrite = f.book.overwritePreset('entry', target);
+  const staleDelete = f.book.deletePreset('entry', target);
+  await preparing; await overwrite;
+  await assert.rejects(staleDelete, /changed/);
+  const current = f.book.presets('entry')[0]; assert.ok(current);
+  const deleting = f.book.deletePreset('entry', current);
+  const saving = f.book.savePreset('entry', 'Exploration');
+  const repeated = f.book.deletePreset('entry', current);
+  await deleting; await saving;
+  await assert.rejects(repeated, /missing/);
+  assert.equal(f.book.presets('entry').length, 1);
+  assert.equal(f.book.presets('entry')[0]?.name, 'Exploration');
+});
