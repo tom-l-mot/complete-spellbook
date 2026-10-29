@@ -11,6 +11,28 @@ Browse your available spells, prepare them for the day, and save sets you can lo
 
 **Version 0.1.0 is an installable development MVP.** It targets Foundry **14.361–14.369** within generation 14 and PF2e **8.6.1**. Live checks passed on Foundry 14.369 with PF2e 8.6.1, using test characters for eleven spellcasting classes. Full multiplayer and player-permission testing remains open. Use a test world first. The manifest does not claim a verified runtime version.
 
+## Screenshots
+
+These screenshots use a test character in Foundry 14.369 with PF2e 8.6.1. Colors and controls can vary with your theme and other modules.
+
+### Sort known spells
+
+Rank view groups focus spells, cantrips, and ranked spells across casting entries. You can also group by casting type or sort by name. **Default View** returns to the native sheet and its resource controls.
+
+![Spellcasting tab sorted by rank, with focus spells, cantrips, and first-rank spells grouped by casting entry](docs/screenshots/spells-by-rank.png)
+
+### Browse, import, and save presets
+
+Browse available spells with search and filters, prepare individual spells, or use the import buttons below the list. The preparation panel keeps **Compare**, **Load**, **Save over**, and **Delete** together for each saved preset.
+
+![Complete Spellbook browser with spell filters, preparation slots, preset actions, and import controls](docs/screenshots/spell-browser-presets.png)
+
+### Automatic imports
+
+In **Game Settings → PF2e Complete Spellbook**, **Show available spells** lets supported characters browse spells without adding them first. **Automatically import missing eligible spells** is a separate option, off by default. When enabled, the elected active GM imports missing spells for approved full-tradition entries after relevant character changes.
+
+![Complete Spellbook settings showing available-spell discovery enabled and automatic imports disabled](docs/screenshots/automatic-import.png)
+
 ## Install locally
 
 1. Extract `build/pf2e-complete-spellbook.zip` into `<Foundry user data>/Data/modules/pf2e-complete-spellbook/`. `module.json` must sit directly in that folder.
