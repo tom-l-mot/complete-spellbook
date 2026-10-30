@@ -29,7 +29,8 @@ test('settings have translated names and hints and manifest paths are local', as
   for (const key of Object.keys(SETTINGS)) { localize(`CS.Settings.${key}.Name`); localize(`CS.Settings.${key}.Hint`); }
   const manifest = JSON.parse(await readFile('module.json', 'utf8'));
   assert.equal(manifest.id, 'pf2e-complete-spellbook');
-  assert.equal(manifest.compatibility.verified, undefined);
+  assert.equal(manifest.compatibility, undefined);
+  assert.deepEqual(manifest.relationships.systems, [{ id: 'pf2e', type: 'system' }]);
   assert.equal(manifest.manifest, undefined);
   assert.equal(manifest.version, JSON.parse(await readFile('package.json', 'utf8')).version);
 });
