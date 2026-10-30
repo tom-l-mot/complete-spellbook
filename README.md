@@ -2,14 +2,14 @@
 
 [![Foundry VTT 14](https://img.shields.io/badge/Foundry_VTT-14-orange)](#install-locally)
 [![Tested with PF2e 8.6.1](https://img.shields.io/badge/Tested_with-PF2e_8.6.1-purple)](docs/VERIFICATION.md)
-[![Development version](https://img.shields.io/badge/version-0.1.0_development-blue)](module.json)
+[![Development version](https://img.shields.io/badge/version-0.1.1_development-blue)](module.json)
 [![Checks](https://github.com/tom-l-mot/pf2e-complete-spellbook/actions/workflows/validate.yml/badge.svg)](https://github.com/tom-l-mot/pf2e-complete-spellbook/actions/workflows/validate.yml)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Support on Ko-fi](https://img.shields.io/badge/Support_on_Ko--fi-FF5E5B?style=flat&logo=kofi&logoColor=white)](https://ko-fi.com/tomlmot)
 
 Browse your available spells, prepare them for the day, and save sets you can load again later. This Foundry VTT module is built for Pathfinder Second Edition. It runs inside Foundry within the Spellcasting Tab.
 
-**Version 0.1.0 is an installable development MVP.** It targets Foundry **14.361–14.369** within generation 14 and PF2e **8.6.1**. Live checks passed on Foundry 14.369 with PF2e 8.6.1, using test characters for eleven spellcasting classes. Full multiplayer and player-permission testing remains open. Use a test world first. The manifest does not claim a verified runtime version.
+**Version 0.1.1 is an installable development MVP.** The manifest and runtime controls set no Foundry or PF2e version limits. The Pathfinder Second Edition system is required. Version 0.1.0 passed live checks on Foundry 14.369 with PF2e 8.6.1, using test characters for eleven spellcasting classes. Other versions are untested and may have incompatible APIs. Full multiplayer and player-permission testing remains open. Use a test world first. The manifest does not claim a verified runtime version.
 
 ## Screenshots
 
@@ -100,9 +100,9 @@ On filesystems that reject npm package extraction, copy the source to a normal l
 
 ## Manifest URL distribution
 
-The source is saved in [tom-l-mot/pf2e-complete-spellbook](https://github.com/tom-l-mot/pf2e-complete-spellbook). No installable GitHub release is published yet. The local manifest omits download URLs until release assets exist.
+The source is saved in [tom-l-mot/pf2e-complete-spellbook](https://github.com/tom-l-mot/pf2e-complete-spellbook). Version 0.1.1 is prepared locally and its release assets are not published yet. The source manifest omits download URLs. Release builds generate those URLs from `GITHUB_REPOSITORY`.
 
-When this repository is published under an owner-approved GitHub repository, the supplied release workflow builds URLs from `GITHUB_REPOSITORY`, validates the version tag, and creates a **draft** release for `v0.1.0`. Publish the reviewed release and use its `module.json` asset URL in Foundry's **Install Module → Manifest URL** field. That manifest points to the versioned ZIP and a latest-release manifest for updates. Do not paste a guessed URL before those assets exist.
+When this repository is published under an owner-approved GitHub repository, the supplied release workflow builds URLs from `GITHUB_REPOSITORY`, validates the version tag, and creates a **draft** release for `v0.1.1`. Publish the reviewed release and use its `module.json` asset URL in Foundry's **Install Module → Manifest URL** field. That manifest points to the versioned ZIP and a latest-release manifest for updates. Do not paste a guessed URL before those assets exist.
 
 ## Project structure
 

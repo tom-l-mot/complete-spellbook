@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { ActorDocument, ItemDocument } from '../src/runtime.ts';
 
-test('a flag refresh following a level change does not cancel opted-in synchronization', async () => {
+test('version numbers allow controls, other systems refuse them, and a flag refresh preserves opted-in synchronization', async () => {
   const callbacks = new Map<string, (...args: never[]) => void>();
   let indexReads = 0;
   const entry: ItemDocument = { id: 'entry', uuid: 'Item.entry', name: 'Divine', type: 'spellcastingEntry',
@@ -18,13 +18,16 @@ test('a flag refresh following a level change does not cancel opted-in synchroni
     Hooks: { once: (name: string, fn: (...args: never[]) => void) => callbacks.set(name, fn), on: (name: string, fn: (...args: never[]) => void) => callbacks.set(name, fn) },
     foundry: { applications: { api: { ApplicationV2: class {}, HandlebarsApplicationMixin: (base: unknown) => base } } },
     ui: { notifications: { error: (value: unknown) => assert.fail(String(value)), warn: () => undefined } },
-    game: { system: { id: 'pf2e', version: '8.6.1' }, release: { generation: 14 }, user: { id: 'gm', isGM: true },
+    game: { system: { id: 'other', version: '9.0.0' }, release: { generation: 15 }, user: { id: 'gm', isGM: true },
       users: { contents: [{ id: 'gm', active: true, isGM: true }] }, modules: new Map(),
       settings: { get: (_scope: string, key: string) => settings.get(key) },
       packs: [{ collection: 'test.spells', documentName: 'Item', testUserPermission: () => true,
         getIndex: async () => { indexReads++; return []; } }] }
   });
   await import('../src/main.ts');
+  callbacks.get('ready')?.();
+  assert.equal(callbacks.has('updateActor'), false);
+  game.system.id = 'pf2e';
   callbacks.get('ready')?.();
   const changed = callbacks.get('updateActor'); assert.ok(changed);
   Reflect.apply(changed, null, [actor, { system: { details: { level: { value: 5 } } } }]);
