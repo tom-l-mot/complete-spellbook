@@ -37,8 +37,8 @@ function changed(actor: ActorDocument | undefined, sync = false): void {
 }
 Hooks.once('init', registerSettings);
 Hooks.once('ready', () => {
-  if (game.system.id !== 'pf2e' || game.release.generation !== 14 || game.system.version !== '8.6.1') {
-    ui.notifications.warn('PF2e Complete Spellbook 0.1.0 targets Foundry 14 and PF2e 8.6.1. Controls are disabled on this version.'); return;
+  if (game.system.id !== 'pf2e') {
+    ui.notifications.warn('PF2e Complete Spellbook requires the Pathfinder Second Edition system.'); return;
   }
   const module = game.modules.get(MODULE_ID); if (module) module.api = { open };
   Hooks.on('renderActorSheet', (sheet: SheetApplication, html: HTMLElement | { 0?: HTMLElement }) => {
