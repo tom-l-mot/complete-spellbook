@@ -6,6 +6,7 @@
 [![Checks](https://github.com/tom-l-mot/pf2e-complete-spellbook/actions/workflows/validate.yml/badge.svg)](https://github.com/tom-l-mot/pf2e-complete-spellbook/actions/workflows/validate.yml)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Support on Ko-fi](https://img.shields.io/badge/Support_on_Ko--fi-FF5E5B?style=flat&logo=kofi&logoColor=white)](https://ko-fi.com/tomlmot)
+[![Follow on Patreon](https://img.shields.io/badge/Follow_on-Patreon-FF424D?style=flat&logo=patreon&logoColor=white)](https://www.patreon.com/TheOpenTableWorkshop)
 
 Browse your available spells, prepare them for the day, and save sets you can load again later. This Foundry VTT module is built for Pathfinder Second Edition. It runs inside Foundry within the Spellcasting Tab.
 
