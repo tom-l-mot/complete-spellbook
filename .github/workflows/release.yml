@@ -18,4 +18,4 @@ jobs:
       - run: npm run check
       - env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" build/module.json build/pf2e-complete-spellbook.zip --draft --title "PF2e Complete Spellbook $GITHUB_REF_NAME" --generate-notes
+        run: gh release create "$GITHUB_REF_NAME" build/module.json build/pf2e-complete-spellbook.zip --draft --title "Complete Spellbook for PF2e & SF2e $GITHUB_REF_NAME" --generate-notes

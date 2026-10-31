@@ -1,10 +1,10 @@
 {
   "name": "pf2e-complete-spellbook",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "license": "MIT",
-  "description": "Virtual spell discovery and safe daily preparation for PF2e on Foundry VTT",
+  "description": "Virtual spell discovery and safe daily preparation for PF2e and SF2e on Foundry VTT",
   "engines": { "node": ">=22.18" },
   "scripts": {
     "typecheck": "tsc --noEmit",

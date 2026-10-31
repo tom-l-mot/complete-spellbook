@@ -1,16 +1,21 @@
-# PF2e Complete Spellbook
+# Complete Spellbook for PF2e & SF2e
 
 [![Foundry VTT 14](https://img.shields.io/badge/Foundry_VTT-14-orange)](#install-locally)
 [![Tested with PF2e 8.6.1](https://img.shields.io/badge/Tested_with-PF2e_8.6.1-purple)](docs/VERIFICATION.md)
-[![Development version](https://img.shields.io/badge/version-0.1.1_development-blue)](module.json)
-[![Checks](https://github.com/tom-l-mot/pf2e-complete-spellbook/actions/workflows/validate.yml/badge.svg)](https://github.com/tom-l-mot/pf2e-complete-spellbook/actions/workflows/validate.yml)
+[![Tested with SF2e 1.6.1](https://img.shields.io/badge/Tested_with-SF2e_1.6.1-purple)](docs/VERIFICATION.md)
+[![Development version](https://img.shields.io/badge/version-0.2.0_development-blue)](module.json)
+[![Checks](https://github.com/tom-l-mot/complete-spellbook/actions/workflows/validate.yml/badge.svg)](https://github.com/tom-l-mot/complete-spellbook/actions/workflows/validate.yml)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Support on Ko-fi](https://img.shields.io/badge/Support_on_Ko--fi-FF5E5B?style=flat&logo=kofi&logoColor=white)](https://ko-fi.com/tomlmot)
 [![Follow on Patreon](https://img.shields.io/badge/Follow_on-Patreon-FF424D?style=flat&logo=patreon&logoColor=white)](https://www.patreon.com/TheOpenTableWorkshop)
 
-Browse your available spells, prepare them for the day, and save sets you can load again later. This Foundry VTT module is built for Pathfinder Second Edition. It runs inside Foundry within the Spellcasting Tab.
+Browse your available spells, prepare them for the day, and save sets you can load again later. This Foundry VTT module is built for Pathfinder Second Edition and Starfinder Second Edition. It runs inside Foundry within the Spellcasting Tab.
 
-**Version 0.1.1 is an installable development MVP.** The manifest and runtime controls set no Foundry or PF2e version limits. The Pathfinder Second Edition system is required. Version 0.1.0 passed live checks on Foundry 14.369 with PF2e 8.6.1, using test characters for eleven spellcasting classes. Other versions are untested and may have incompatible APIs. Full multiplayer and player-permission testing remains open. Use a test world first. The manifest does not claim a verified runtime version.
+**Version 0.2.0 supports PF2e and SF2e.** Focused live checks passed in separate disposable worlds on Foundry 14.369 with PF2e 8.6.1 and SF2e 1.6.1. SF2e checks covered all eight shipped classes across 49 actors, including all 13 casting options. They covered applicable browsing, sorting, favorites, native casting, preparation safeguards, presets, spent slots, and reload persistence. See [the verification record](docs/VERIFICATION.md) for fixture details and exact coverage.
+
+The manifest and runtime controls set no version limits. Other versions, every class progression and feat combination, multiplayer, and player-only permissions remain unverified. Use a test world first. The module keeps its existing `pf2e-complete-spellbook` ID, settings, installation folder, and Foundry package slug so existing installations can update normally. Its repository is now `complete-spellbook`.
+
+In SF2e, Mystic and Witchwarper repertoires show owned spells and retain native casting and signature behavior. The module cannot import whole traditions, prepare slots, or apply preparation presets to repertoire entries. Technomancer and other prepared SF2e lists require explicit GM review in **Spellbook settings**. Keep full-tradition access disabled for a Technomancer's owned spell database. No PF2e class rule is applied automatically in SF2e, including copied classes. Native spell sorting uses the shared sheet structure.
 
 ## Screenshots
 
@@ -30,14 +35,14 @@ Browse available spells with search and filters, prepare individual spells, or u
 
 ### Automatic imports
 
-In **Game Settings → PF2e Complete Spellbook**, **Show available spells** lets supported characters browse spells without adding them first. **Automatically import missing eligible spells** is a separate option, off by default. When enabled, the elected active GM imports missing spells for approved full-tradition entries after relevant character changes.
+In **Game Settings → Complete Spellbook for PF2e & SF2e**, **Show available spells** lets supported characters browse spells without adding them first. **Automatically import missing eligible spells** is a separate option, off by default. When enabled, the elected active GM imports missing spells for approved full-tradition entries after relevant character changes.
 
 ![Complete Spellbook settings showing available-spell discovery enabled and automatic imports disabled](docs/screenshots/automatic-import.png)
 
 ## Install locally
 
 1. Extract `build/pf2e-complete-spellbook.zip` into `<Foundry user data>/Data/modules/pf2e-complete-spellbook/`. `module.json` must sit directly in that folder.
-2. Restart Foundry when no game is in progress, then enable **PF2e Complete Spellbook** in a PF2e test world's module settings.
+2. Restart Foundry when no game is in progress, then enable **Complete Spellbook for PF2e & SF2e** in a PF2e or SF2e test world's module settings.
 3. Open a character sheet. On the **Spellcasting** tab, click the round book icon to the left of **Known Spells**. A script macro is also available:
 
    ```js
@@ -47,7 +52,7 @@ In **Game Settings → PF2e Complete Spellbook**, **Show available spells** lets
 
 ## Set up a character
 
-Open the spellbook. It recognizes a supported class's ordinary spell list when the character has one matching prepared list with cantrips. Druid, Animist, Witch, and Magus ordinary preparation is ready automatically. Clerics can browse their tradition spells and prepare cantrips immediately. Wizards keep their learned spells, and Unified Magical Theory preparation is ready automatically.
+In PF2e, open the spellbook. It recognizes a supported class's ordinary spell list when the character has one matching prepared list with cantrips. Druid, Animist, Witch, and Magus ordinary preparation is ready automatically. Clerics can browse their tradition spells and prepare cantrips immediately. Wizards keep their learned spells, and Unified Magical Theory preparation is ready automatically.
 
 Cleric font slots and Wizard school slots, including bonus cantrips, may have special rules. PF2e does not label those slots, so the GM checks any uncertain ranks once in **Spellbook settings**. Check a rank only when every slot in it is for ordinary spells. Leave mixed or special ranks unchecked and manage them on the character sheet. Magus Studious Spells also needs this check.
 
@@ -61,10 +66,10 @@ Automatic recognition is conservative, but PF2e's generic entries cannot prove t
 
 - Search names and descriptions. Filter rank, tradition, traits or legacy schools, rarity, action cost, damage, category and status. Sort by name or rank. Lists show 100 rows per page.
 - Choose **All entries** for a unified view. Every row retains its destination entry. Focus and innate entries display their existing spells; the category menu filters spell kinds.
-- Hover over a spell's name to read a short description. Click its name for the full PF2e details. Stars store favorites per character using source identities that survive import. Recent status lists the last 20 spells prepared through this module, not casts from other sheets.
+- Hover over a spell's name to read a short description. Click its name for the full native spell details. Stars store favorites per character using source identities that survive import. Recent status lists the last 20 spells prepared through this module, not casts from other sheets.
 - **Prepare** lets you select an approved compatible slot, including a higher rank. An Available spell is added to the character when needed. Expended slots stay expended. **Clear** also preserves the expended state.
 - **Import eligible spells** previews every missing eligible spell. **Import filtered ranks / results** applies current filters; **Import selected** uses checked rows. The checkbox beside **Select** selects all available spells matching your filters, across every page. Confirmation is required before import starts. **Stop import** stops between document writes. Completed imports remain intact and a retry skips them.
-- Existing owned spell documents are never overwritten or deleted. Identical sources in different entries remain separate, because PF2e associates each owned spell with one entry.
+- Existing owned spell documents are never overwritten or deleted. Identical sources in different entries remain separate, because the system associates each owned spell with one entry.
 
 ## Sort the character sheet's known spells
 
@@ -82,7 +87,7 @@ Loading validates every target and spell, saves previous assignments separately 
 
 ## Settings
 
-The GM controls virtual discovery, allowed compendium IDs, uncommon/rare access, legacy inclusion, imports, presets, favorites, cache duration and debug logging. The default source is `pf2e.spells-srd`. Pack visibility still applies. The default rarity filter is a client display preference and cannot expand access.
+The GM controls virtual discovery, allowed compendium IDs, uncommon/rare access, legacy inclusion, imports, presets, favorites, cache duration and debug logging. The default source is `pf2e.spells-srd` in PF2e and `sf2e.spells` in SF2e. Existing source settings, including an empty setting, stay unchanged. Pack visibility still applies. The default rarity filter is a client display preference and cannot expand access.
 
 **Automatically import missing eligible spells** is off by default. Enabling it allows the elected active GM to fill approved full-tradition entries after relevant character changes. It never deletes spells or changes slot capacity. Browsing automatically reflects changes even when physical synchronization is off.
 
@@ -101,9 +106,9 @@ On filesystems that reject npm package extraction, copy the source to a normal l
 
 ## Manifest URL distribution
 
-The source is saved in [tom-l-mot/pf2e-complete-spellbook](https://github.com/tom-l-mot/pf2e-complete-spellbook). Version 0.1.1 is prepared locally and its release assets are not published yet. The source manifest omits download URLs. Release builds generate those URLs from `GITHUB_REPOSITORY`.
+The source and releases are in [tom-l-mot/complete-spellbook](https://github.com/tom-l-mot/complete-spellbook). Use [the latest module manifest](https://github.com/tom-l-mot/complete-spellbook/releases/latest/download/module.json) to install or update through Foundry. The source manifest omits download URLs. Release builds generate those URLs from `GITHUB_REPOSITORY`.
 
-When this repository is published under an owner-approved GitHub repository, the supplied release workflow builds URLs from `GITHUB_REPOSITORY`, validates the version tag, and creates a **draft** release for `v0.1.1`. Publish the reviewed release and use its `module.json` asset URL in Foundry's **Install Module → Manifest URL** field. That manifest points to the versioned ZIP and a latest-release manifest for updates. Do not paste a guessed URL before those assets exist.
+When this repository is published under an owner-approved GitHub repository, the supplied release workflow builds URLs from `GITHUB_REPOSITORY`, validates the version tag, and creates a **draft** release for `v0.2.0`. Publish the reviewed release and use its `module.json` asset URL in Foundry's **Install Module → Manifest URL** field. That manifest points to the versioned ZIP and a latest-release manifest for updates. Do not paste a guessed URL before those assets exist.
 
 ## Project structure
 
@@ -133,7 +138,7 @@ docs/              Architecture, manual testing and decision trail
 - This module respects Foundry permissions through its own operations. It cannot prevent an actor owner from using other Foundry features or arbitrary JavaScript to alter their actor.
 - Run the [live test matrix](docs/MANUAL_TESTING.md), including player permissions, mixed casting entries, theme/keyboard behavior and disablement, before broad use. Publish release assets only after that validation. Wider PF2e version support requires rechecking the adapter.
 
-Disabling the module leaves imported spells and preparation data in standard PF2e items. Its stored flags remain inert. No migration or cleanup deletion runs on disablement.
+Disabling the module leaves imported spells and preparation data in standard system items. Its stored flags remain inert. No migration or cleanup deletion runs on disablement.
 
 See [RESEARCH.md](RESEARCH.md) for source links and licenses and [architecture](docs/ARCHITECTURE.md) for policy and failure contracts. This project is unofficial and not endorsed by Paizo or Foundry Gaming.
 

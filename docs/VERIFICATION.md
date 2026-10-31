@@ -1,5 +1,83 @@
 # Verification record
 
+## SF2e class matrix, 2026-10-30
+
+Candidate `3bf6ecc08114eec622301859df0577ae744456f6`, module 0.2.0, passed the class matrix on Foundry 14.369 and SF2e 1.6.1. Tests ran as GM in the isolated `complete-spellbook-sf2e-qa` world. The tested JavaScript SHA256 matched the candidate build: `1C07F9E3ADDE38C28B2E1EB90CA8CB0943637122BA3F8E9C0DC2E4D49BF0282D`.
+
+The installed class compendium contains eight classes. All eight were exercised across 49 actors. This count comprises all 35 characters supplied in `sf2e.iconics` and `sf2e.paizo-pregens`, 13 casting-option fixtures, and one Mechanic smoke-test fixture.
+
+| Class | Actors | Coverage and result |
+| --- | ---: | --- |
+| Mystic | 11 | Passed six supplied characters and all five connections: Akashic, Elemental, Healing, Rhythm, and Shadow. Covered divine, occult, and primal entries. |
+| Witchwarper | 10 | Passed six supplied characters and all four paradoxes: Analyst, Anomaly, Gap Influenced, and Precog. Covered arcane and occult entries. |
+| Technomancer | 4 | Passed all four programming languages: DPS++, FORTRUN, Servoshell, and Viper. Covered arcane prepared casting and separate Magic Hack focus spells. |
+| Envoy | 6 | Passed supplied characters with no spell entries. Opening the module and native sheet did not add spells. |
+| Operative | 6 | Passed the same noncaster checks. |
+| Solarian | 6 | Passed the same noncaster checks. Stellar focus is not a focus-spell entry. |
+| Soldier | 5 | Passed the same noncaster checks. |
+| Mechanic | 1 | Passed the same noncaster checks using the actual class document. |
+
+The 35 supplied characters were imported from complete actor documents containing class, ancestry, equipment, features, and spell data. The import asserted class identity, not byte-for-byte preservation of every field. They cover levels 1, 3, 5, and 7. The 13 additional fixtures use actual class and connection, paradox, or programming-language documents with real compendium spells and manually configured level-3 casting entries. They are focused integration fixtures, not fully built playable characters or a validation of class progression tables.
+
+All 25 caster actors passed these checks:
+
+- Each list matched its owned-spell count and contained only owned entries. Focus spells stayed separate. A real unlearned spell import was refused without actor changes. Unapproved preparation was refused, and spontaneous or focus entries refused access grants.
+- Favorites persisted. Rank, casting-type, and name sorting preserved every rendered row. Restoring the native view returned the same elements to their original parents without changing actor data.
+- Native cast buttons worked from the sorted view on 21 spontaneous, four prepared, and 25 focus entries. The checks asserted the corresponding slot expenditure or focus-point decrease. Native signature toggles worked on all 21 spontaneous entries.
+- Each Technomancer required GM review. Approval used `fullTradition: false`, preserving its owned spell database. Cantrip preparation, rank-one preparation, heightening into rank two, and preset restoration passed. Restoring a preset preserved an expended slot. Native casting then expended the restored prepared spell.
+
+After a full browser reload, all 49 actors retained the expected owned-list counts and origins, favorites, slot assignments, expended states, signatures, and focus values. The applicable preset names remained present. `node --check .audit/sf2e-classes-live.mjs` passed. The previous 88-test automated result remains applicable because this pass changed no product source or build output.
+
+The rerunnable local script and per-actor results are retained in `.audit/sf2e-classes-live.mjs`, `.audit/sf2e-class-results.json`, and `.audit/sf2e-class-reload.json`. Initial test-script failures are recorded separately. A dotted array update dropped a test slot's spell ID, and a saved sort preference invalidated the test's initial parent snapshot. The script now uses native slot-expended methods, clears its disposable prepared fixtures before each unfinished run, and restores the default view before recording row parents. These failed attempts are not counted as passes.
+
+The class pass found SF2E-CLASS-001. Preparing the same spell into the same occupied slot reported `The system refused the preparation. Any imported spell was kept.` The native system returned no updated document for this unchanged operation, and `src/runtime.ts` treated that result as a refusal. A separate reproduction on DPS++ rank-two slot zero confirmed the error and an unchanged actor snapshot. No data loss was observed. Evidence is `.audit/sf2e-class-noop.json`. The subsequent fix is recorded below.
+
+This completes the stated SF2e class and casting-option matrix for these versions. It does not complete the entire manual acceptance procedure. Player-only permissions, simultaneous editors, mixed-module compatibility, arbitrary archetypes and feat combinations, high-level Technomancer features such as Administrator Privileges, and every individual spell effect remain outside this pass. No public release or repository rename occurred.
+
+## Repeated preparation fix, 2026-10-30
+
+SF2E-CLASS-001 is fixed. After the existing ownership, approval, rank, eligibility, and native API checks, `Spellbook.prepare` returns successfully if the target slot already contains the requested spell. Clearing an already empty slot also succeeds. Neither case changes the slot, expended state, or recent history. A native refusal for a different assignment still raises the existing error.
+
+The focused command `node --test --test-name-pattern='repeated preparation|clearing an empty|a native null' tests/runtime.test.ts` reproduced eight failures before the fix, all with the preparation-refusal error. After the fix, all 12 focused cases passed. They cover PF2e and SF2e, spent and unspent slots, empty clears, revoked ownership or approval, restricted ranks, ineligible spells, missing preparation APIs, and native refusals for different assignments. All 53 runtime tests passed independently. The full `npm run check` passed strict TypeScript checks, all 100 tests, bundle generation, and ZIP validation in the local build mirror under Node 24.19.0.
+
+Live verification used the same isolated SF2e 1.6.1 world and Foundry 14.369. The original DPS++ rank-two operation failed before replacing the build. With the fixed build, repeating preparation in its spent rank-one and unspent rank-two slots succeeded with identical actor snapshots. Clearing an empty slot also left the actor unchanged. Confirming the already occupied spent slot through the actual Prepare dialog closed the dialog, re-enabled controls, and displayed no error. An ordinary new assignment followed by clearing restored the original slot and resource data.
+
+Evidence remains in `.audit/prepare-noop-live-before.json`, `.audit/prepare-noop-live-after.json`, `.audit/prepare-noop-ui-after.json`, and `.audit/prepare-noop-live-replace.json`. The live JavaScript SHA256 was `48AB0719965161414B436596731425ECD17E68470EB8EDBA030CFEE7ECF51DEE`. Independent source review found no actionable issues. A separate comment review found no added comments or suppressions. These focused checks do not rerun the previous 49-actor class matrix or expand its stated limits.
+
+## Combined 0.2.0 scope
+
+The combined version uses the existing browser, sorting, catalog, and document operations for both systems. Source inspection is pinned to upstream commit `675d2b7d613a80572b0330364ce84659068abe66`:
+
+- [SF2e manifest](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/system.sf2e.json) defines the `spells` pack (`sf2e.spells`).
+- [Build configuration](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/vite.config.ts) builds both systems from `src/pf2e.ts` with system identity injected.
+- [Shared spellcasting template](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/static/templates/actors/character/tabs/spellcasting.hbs) retains the known-spells selectors and `PF2E` localization namespace used by sorting.
+- [Item data](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/src/module/item/base/data/system.ts) and [item document](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/src/module/item/base/document.ts) store grant provenance under the active system namespace.
+- [Spell collection](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/src/module/item/spellcasting-entry/collection.ts) retains `prepareSpell(spell, groupId, slotIndex)`.
+
+Source inspection and the focused live checks below establish different parts of the evidence. The historical PF2e results later in this document apply to their stated versions. See [the combined manual matrix](MANUAL_TESTING.md#combined-020-acceptance) for the remaining full acceptance work.
+
+## Combined 0.2.0 live checks, 2026-10-30
+
+Used an isolated licensed Foundry 14.369 server with copied PF2e 8.6.1 and SF2e 1.6.1 installations. Each system had its own disposable world, a GM session, and only Complete Spellbook active. The existing Foundry server and campaign were not changed. The test server used Node 24.19.0.
+
+| Check | Result |
+| --- | --- |
+| PF2e and SF2e startup | Passed. The module API and native sheet controls loaded, with the correct system-specific default spell pack. |
+| SF2e Mystic and Witchwarper fixtures | Passed. Owned spells and favorites displayed, native sorting restored the original view, and unsupported repertoire imports, preparation, and access configuration were refused without actor changes. |
+| SF2e copied Cleric prepared fixture | Passed. Required GM review before preparation. After approval, preparation, preset save/load, and spent-slot preservation worked. |
+| PF2e Cleric and Sorcerer fixtures | Passed. Automatic Cleric tradition access and native Sorcerer restrictions remained intact. Preparation, presets, favorites, sorting, and spent-slot preservation worked. |
+| Real PF2e and SF2e compendium imports | Passed in both systems. Imported one approved virtual spell, repeated the import without a duplicate, and preserved the expended preparation slot. SF2e's reviewed prepared list displayed real virtual spells from `sf2e.spells`. |
+| Real unlearned repertoire spells | Passed in both systems. A real unowned common divine spell from the configured source pack was refused without actor changes. Synthetic tests additionally cover stale grants. |
+| Reload in both systems | Passed. Owned spells, favorites, presets, prepared assignments, and expended states persisted. |
+| Browser DOM checks in both systems | Passed. Ran the bundled `runSpellSortDomChecks()` including Mystic and Witchwarper row restoration. |
+| Final captured browser error logs | Empty for both recorded system checks. This is not an exhaustive log audit. |
+
+The live harness used native document APIs and the module's actual application/controller. Class fixtures contained minimal native class documents with the relevant slugs, not complete playable class builds. Browsing and sorting compared actor snapshots. Native casting and signature actions, non-GM sessions, simultaneous clients, all subclasses, and interactions with other modules remain outside this pass.
+
+Automated verification used the exclusive local build mirror. `npm run check` passed strict TypeScript checks, 88 tests, bundling, and ZIP content validation with both Node 26.4.0 and Node 24.19.0. `node --test tests/settings.test.ts` also passed after its expected pack IDs were made literal. Initial fixture and tooling failures were corrected before the recorded successful runs. Local harness, JSON results, screenshots, and detailed notes are retained in the ignored `.audit` folder.
+
+Independent Astra review of the implementation and settings assertions found no actionable correctness or security findings and independently passed 85 focused tests. No public release or Foundry listing change is implied by these checks.
+
 This is a development MVP. The original automated record below is followed by live testing updates. Synthetic tests and live checks cover different parts of the module.
 
 ## Commands and results

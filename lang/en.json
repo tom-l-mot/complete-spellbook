@@ -1,9 +1,9 @@
 {
   "CS": {
-    "Title": "Complete Spellbook",
+    "Title": "Complete Spellbook for PF2e & SF2e",
     "Native": "Character sheet",
     "Refresh": "Refresh sources",
-    "NoEntries": "Add a spellcasting entry on the PF2e character sheet first.",
+    "NoEntries": "Add a spellcasting entry on the character sheet first.",
     "Search": "Search",
     "SearchHint": "Name or description",
     "Rank": "Rank",
@@ -86,7 +86,7 @@
     "Settings": {
       "virtual": {
         "Name": "Show available spells",
-        "Hint": "Find spells your character can use without adding them first. Supported class spell lists are recognized automatically."
+        "Hint": "Find spells your character can use without adding them first. Supported PF2e class spell lists are recognized automatically. SF2e prepared lists need GM review."
       },
       "autoSync": {
         "Name": "Automatically import missing eligible spells",
@@ -118,7 +118,7 @@
       },
       "sources": {
         "Name": "Allowed spell compendiums",
-        "Hint": "Comma-separated pack IDs. Defaults to pf2e.spells-srd. Normal Foundry pack permissions also apply."
+        "Hint": "Comma-separated pack IDs. Defaults to pf2e.spells-srd in PF2e or sf2e.spells in SF2e. Normal Foundry pack permissions also apply."
       },
       "cacheMinutes": {
         "Name": "Index cache duration",

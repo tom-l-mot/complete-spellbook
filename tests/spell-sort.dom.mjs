@@ -88,6 +88,20 @@ export function runSpellSortDomChecks() {
     root.remove(); localStorage.setItem(key, 'unsupported'); root = fixture(); installSpellSort(root, actorUuid);
     assert(root.querySelector('[data-cs-sorted]').hidden, 'corrupt preference uses the native view');
     root.remove();
+    localStorage.removeItem(key); root = fixture();
+    const repertoires = [...root.querySelectorAll('.spellcasting-entry')].slice(0, 2);
+    for (const [index, entry] of repertoires.entries()) {
+      entry.querySelector('input').value = index === 0 ? 'Mystic' : 'Witchwarper';
+      entry.querySelector('.spell-list').dataset.category = 'spontaneous';
+    }
+    const repertoireRows = repertoires.flatMap(entry => [...entry.querySelectorAll('.spell[data-item-id]')]);
+    const repertoireParents = repertoireRows.map(row => row.parentElement);
+    const repertoireData = repertoireRows.map(row => JSON.stringify(row.dataset));
+    installSpellSort(root, actorUuid); root.querySelector('[data-cs-sort-toggle]').click();
+    assert(repertoireRows.every(row => root.querySelector('[data-cs-sorted]').contains(row)), 'SF2e repertoire rows move with their original native controls');
+    root.querySelector('[data-cs-sort-toggle]').click();
+    assert(repertoireRows.every((row, index) => row.parentElement === repertoireParents[index] && JSON.stringify(row.dataset) === repertoireData[index]), 'SF2e repertoire context restores without document changes');
+    root.remove();
     root = fixture(); root.querySelector('.spell').removeAttribute('data-cast-rank');
     const before = root.innerHTML; installSpellSort(root, actorUuid);
     assert(root.innerHTML === before, 'malformed occurrence prevents all DOM mutation');

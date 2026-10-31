@@ -25,6 +25,7 @@ export interface Pack {
   getDocument(id: string): Promise<ItemDocument | null>;
 }
 export interface Environment {
+  system: { id: string };
   user: { id: string; isGM: boolean };
   packs: Iterable<Pack>;
   settings: { get(scope: string, key: string): unknown; set(scope: string, key: string, value: unknown): Promise<unknown> };
@@ -119,11 +120,11 @@ export class Spellbook {
     const items = this.actor.items.contents;
     const features = items.filter(i => i.type === 'feat').map(i => text(record(i.system).slug));
     const ambiguous = items.some(i => i.type === 'feat' && strings(record(record(i.system).traits).value).some(t => t === 'archetype' || t === 'dedication')) ||
-      items.filter(i => i.type === 'class').length > 1 || !!text(record(record(record(this.actor.items.get(e.id)?.flags).pf2e).grantedBy).id);
+      items.filter(i => i.type === 'class').length > 1 || !!text(record(record(record(this.actor.items.get(e.id)?.flags)[this.env.system.id]).grantedBy).id);
     const system = record(this.actor.items.get(e.id)?.system);
     const special = /\b(font|curriculum|apparition|studious|archetype|dedication)\b/i.test(e.name) ||
       !!record(system.prepared).validItems || (Array.isArray(system.rules) && system.rules.length > 0);
-    return recognize(e, this.entries(), this.actor.class?.slug ?? '', features, ambiguous, special);
+    return recognize(this.env.system.id, e, this.entries(), this.actor.class?.slug ?? '', features, ambiguous, special);
   }
   private savedGrant(e: Entry): Grant | undefined {
     const raw = this.env.settings.get(MODULE_ID, 'grants');
@@ -234,9 +235,11 @@ export class Spellbook {
       if (spell === undefined) throw new Error('Imported spell was not found.');
       error = preparationError(e, this.grant(e), spell, rank, index); if (error) throw new Error(error);
       const collection = this.actor.items.get(entryId)?.spells;
-      if (!collection || typeof collection.prepareSpell !== 'function') throw new Error('Unsupported PF2e preparation API.');
-      this.assertOwner(); const result = await collection.prepareSpell(item, rank === 0 ? 'cantrips' : rank, index);
-      if (!result) throw new Error('PF2e refused the preparation. Any imported spell was kept.');
+      if (!collection || typeof collection.prepareSpell !== 'function') throw new Error('Unsupported system preparation API.');
+      this.assertOwner();
+      if (e.slots.find(s => s.rank === rank)?.prepared[index]?.id === (item?.id ?? null)) return;
+      const result = await collection.prepareSpell(item, rank === 0 ? 'cantrips' : rank, index);
+      if (!result) throw new Error('The system refused the preparation. Any imported spell was kept.');
       if (item) await this.remember(item.id);
     });
   }

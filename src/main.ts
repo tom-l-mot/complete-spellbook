@@ -3,7 +3,7 @@ import { catalog, Spellbook } from './runtime.ts';
 import type { ActorDocument } from './runtime.ts';
 import type { SheetApplication, ItemHookDocument } from './foundry.d.ts';
 import { CompleteSpellbook, openApps } from './app.ts';
-import { registerSettings } from './settings.ts';
+import { registerSettings, isSupportedSystem } from './settings.ts';
 import { installSpellSort } from './spell-sort.ts';
 
 export function open(actor: ActorDocument): CompleteSpellbook {
@@ -35,10 +35,10 @@ function changed(actor: ActorDocument | undefined, sync = false): void {
     }
   }, 250));
 }
-Hooks.once('init', registerSettings);
+Hooks.once('init', () => { if (isSupportedSystem(game.system.id)) registerSettings(); });
 Hooks.once('ready', () => {
-  if (game.system.id !== 'pf2e') {
-    ui.notifications.warn('PF2e Complete Spellbook requires the Pathfinder Second Edition system.'); return;
+  if (!isSupportedSystem(game.system.id)) {
+    ui.notifications.warn('Complete Spellbook requires the Pathfinder Second Edition or Starfinder Second Edition system.'); return;
   }
   const module = game.modules.get(MODULE_ID); if (module) module.api = { open };
   Hooks.on('renderActorSheet', (sheet: SheetApplication, html: HTMLElement | { 0?: HTMLElement }) => {

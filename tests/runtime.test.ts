@@ -149,7 +149,7 @@ function fixture() {
     ['sources', pack.collection], ['cacheMinutes', 10], ['virtual', true], ['import', true],
     ['presets', true], ['favorites', true], ['uncommon', false], ['rare', false], ['legacy', false]
   ]);
-  const env: Environment = { user: { id: 'synthetic-user', isGM: true }, packs: [pack], settings: {
+  const env: Environment = { system: { id: 'pf2e' }, user: { id: 'synthetic-user', isGM: true }, packs: [pack], settings: {
     get: (_scope, key) => settings.get(key),
     set: async (_scope, key, value) => { settings.set(key, value); }
   } };
@@ -169,6 +169,59 @@ function fixture() {
 }
 
 const sourceKey = (id = 'alpha') => `Compendium.synthetic.spells.Item.${id}`;
+test('SF2e prepared lists require review even for a copied PF2e class, then use explicit grants', async () => {
+  const f = fixture(); f.env.system.id = 'sf2e'; f.actor.class.slug = 'cleric'; f.settings.delete('grants');
+  record(f.entry.system.slots).slot0 = { max: 1, value: 1, prepared: [{ id: null, expended: false }] };
+  f.entry.flags = { sf2e: { grantedBy: { id: 'granting-feature' } } };
+  assert.deepEqual(f.book.recognition(f.book.entry('entry')), { kind: 'review', reason: 'UnclearEntry' });
+  assert.equal(f.book.needsSetup(f.book.entry('entry')), true);
+  assert.equal((await f.book.list('entry')).length, 0);
+  await f.book.configure('entry', { fullTradition: true, extra: [], preparation: true, allowedRanks: [0, 1] });
+  await f.book.prepare('entry', sourceKey(), 1, 0);
+  assert.equal(f.actor.created.length, 1);
+  const slots = prepared(f.entry); assert.ok(Array.isArray(slots));
+  assert.equal(record(slots[0]).id, 'owned-1');
+});
+
+test('recognition reads grant provenance from the active system namespace', () => {
+  const f = fixture(); f.settings.delete('grants'); f.actor.class.slug = 'druid';
+  f.entry.system.tradition = { value: 'primal' };
+  record(f.entry.system.slots).slot0 = { max: 1, value: 1, prepared: [{ id: null, expended: false }] };
+  f.entry.flags = { sf2e: { grantedBy: { id: 'foreign-feature' } } };
+  assert.equal(f.book.recognition(f.book.entry('entry')).kind, 'automatic');
+  f.entry.flags = { pf2e: { grantedBy: { id: 'active-feature' } } };
+  assert.equal(f.book.recognition(f.book.entry('entry')).kind, 'review');
+  f.env.system.id = 'sf2e';
+  let sfProvenanceReads = 0;
+  f.entry.flags = { get sf2e() { sfProvenanceReads++; return { grantedBy: { id: 'active-feature' } }; },
+    get pf2e() { return assert.fail('SF2e recognition read PF2e provenance.'); } };
+  assert.equal(f.book.recognition(f.book.entry('entry')).kind, 'review');
+  assert.equal(sfProvenanceReads, 1);
+});
+
+for (const slug of ['mystic', 'witchwarper']) test(`SF2e ${slug} browses owned repertoire and refuses writes despite stale grants`, async () => {
+  const f = fixture();
+  await f.book.prepare('entry', sourceKey(), 1, 0);
+  await f.book.savePreset('entry', 'Before conversion');
+  const preset = f.book.presets('entry')[0]; assert.ok(preset);
+  f.env.system.id = 'sf2e'; f.actor.class.slug = slug;
+  f.entry.system.prepared = { value: 'spontaneous' };
+  f.settings.set('grants', [{ actorUuid: f.actor.uuid, entryId: f.entry.id, classSlug: slug, category: 'spontaneous', tradition: 'arcane', fullTradition: true,
+    extra: [], preparation: true, slotShape: slotShape(f.book.entry('entry')), allowedRanks: [1] }]);
+  const before = structuredClone({ created: f.actor.created, flags: [...f.actor.flags], system: f.entry.system, settings: [...f.settings] });
+  const listed = await f.book.list('entry');
+  assert.deepEqual(listed.map(s => s.name), ['alpha']);
+  assert.equal(f.book.grant(f.book.entry('entry')), undefined);
+  assert.equal(f.book.needsSetup(f.book.entry('entry')), false);
+  const outcome = await f.book.import('entry', [sourceKey('beta')]);
+  assert.equal(outcome.imported, 0); assert.match(outcome.stopped ?? '', /not eligible/);
+  await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /character sheet/);
+  await assert.rejects(f.book.configure('entry', { fullTradition: true, extra: [], preparation: true, allowedRanks: [1] }), /character sheet/);
+  await assert.rejects(f.book.savePreset('entry', 'Unsafe'), /No approved/);
+  assert.throws(() => f.book.preview('entry', preset));
+  await assert.rejects(f.book.applyPreset('entry', preset, f.book.fingerprint('entry')));
+  assert.deepEqual({ created: f.actor.created, flags: [...f.actor.flags], system: f.entry.system, settings: [...f.settings] }, before);
+});
 test('automatic Druid access works for an owner without writing GM settings and preserves spent slots', async () => {
   const f = fixture(); f.settings.delete('grants'); f.actor.class.slug = 'druid'; f.env.user.isGM = false;
   f.entry.system.tradition = { value: 'primal' };
@@ -221,6 +274,77 @@ test('Wizard curriculum cantrips reject writes before changing a slot', async ()
 function prepared(item: MemoryItem) {
   return record(record(item.system.slots).slot1).prepared;
 }
+
+for (const system of ['pf2e', 'sf2e']) {
+  for (const expended of [false, true]) {
+    test(`${system} repeated preparation succeeds without changing an ${expended ? 'expended' : 'unspent'} slot`, async () => {
+      const f = fixture(); f.env.system.id = system;
+      await f.book.import('entry', [sourceKey()]);
+      const slots = prepared(f.entry); assert.ok(Array.isArray(slots));
+      slots[0] = { id: 'owned-1', expended };
+      const before = structuredClone(f.entry.system);
+      let writes = 0;
+      f.entry.spells = { prepareSpell: async () => { writes++; return null; } };
+      await f.book.prepare('entry', 'owned-1', 1, 0);
+      assert.deepEqual(f.entry.system, before);
+      assert.equal(f.actor.created.length, 1);
+      assert.equal(writes, 0);
+    });
+
+    test(`${system} clearing an empty ${expended ? 'expended' : 'unspent'} slot succeeds without a native write`, async () => {
+      const f = fixture(); f.env.system.id = system;
+      const slots = prepared(f.entry); assert.ok(Array.isArray(slots));
+      slots[0] = { id: null, expended };
+      const before = structuredClone(f.entry.system);
+      let writes = 0;
+      f.entry.spells = { prepareSpell: async () => { writes++; return null; } };
+      await f.book.prepare('entry', null, 1, 0);
+      assert.deepEqual(f.entry.system, before);
+      assert.equal(writes, 0);
+    });
+  }
+
+  test(`${system} repeated preparation still checks ownership, approval, rank, eligibility and native API support`, async () => {
+    const f = fixture(); f.env.system.id = system;
+    await f.book.import('entry', [sourceKey()]);
+    const slots = prepared(f.entry); assert.ok(Array.isArray(slots));
+    slots[0] = { id: 'owned-1', expended: true };
+    const before = structuredClone(f.entry.system);
+    f.entry.spells = { prepareSpell: async () => assert.fail('Invalid preparation reached the native API.') };
+    f.actor.isOwner = false;
+    await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /ownership/);
+    f.actor.isOwner = true;
+    const grants = f.settings.get('grants');
+    f.settings.set('grants', []);
+    await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /GM must review/);
+    f.settings.set('grants', grants);
+    await f.book.configure('entry', { fullTradition: true, extra: [], preparation: true, allowedRanks: [] });
+    await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /restricted|unconfirmed/);
+    f.settings.set('grants', grants);
+    const spell = f.actor.items.get('owned-1'); assert.ok(spell);
+    record(spell.system).level = { value: 2 };
+    await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /cannot use this slot/);
+    record(spell.system).level = { value: 1 };
+    record(spell.system).location = { value: 'other-entry' };
+    await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /cannot use this slot/);
+    record(spell.system).location = { value: 'entry' };
+    f.entry.spells = undefined;
+    await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /Unsupported system preparation API/);
+    assert.deepEqual(f.entry.system, before);
+  });
+
+  test(`${system} a native null result still refuses a different preparation`, async () => {
+    const f = fixture(); f.env.system.id = system;
+    const before = structuredClone(f.entry.system);
+    let writes = 0;
+    f.entry.spells = { prepareSpell: async () => { writes++; return null; } };
+    await assert.rejects(f.book.prepare('entry', sourceKey(), 1, 0), /system refused the preparation/);
+    assert.deepEqual(f.entry.system, before);
+    assert.equal(f.actor.created.length, 1);
+    assert.equal(writes, 1);
+  });
+}
+
 function preset(entryId = 'entry'): Preset {
   return { version: 1, id: 'synthetic-preset', name: 'Synthetic preparation', entryId,
     assignments: [{ rank: 1, index: 0, spellId: 'owned-1' }, { rank: 1, index: 1, spellId: null }] };

@@ -11,9 +11,10 @@ const classes: Record<string, { tradition: string; full: boolean }> = {
   witch: { tradition: '', full: false }, magus: { tradition: 'arcane', full: false }
 };
 
-export function recognize(entry: Entry, entries: Entry[], classSlug: string, features: string[], ambiguous: boolean, special: boolean): Recognition {
+export function recognize(systemId: string, entry: Entry, entries: Entry[], classSlug: string, features: string[], ambiguous: boolean, special: boolean): Recognition {
   if (entry.category !== 'prepared') return { kind: 'native', reason: 'NativeNotice' };
   if (special) return { kind: 'native', reason: 'SpecialEntry' };
+  if (systemId !== 'pf2e') return { kind: 'review', reason: 'UnclearEntry' };
   const rule = classes[classSlug];
   const candidates = entries.filter(e => e.category === 'prepared' && (!rule?.tradition || e.tradition === rule.tradition) && e.slots.some(s => s.rank === 0 && s.max > 0));
   if (!rule || ambiguous || !['arcane', 'divine', 'occult', 'primal'].includes(entry.tradition) || candidates.length !== 1 || candidates[0]?.id !== entry.id) {
