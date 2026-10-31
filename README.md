@@ -2,6 +2,7 @@
 
 [![Foundry VTT 14](https://img.shields.io/badge/Foundry_VTT-14-orange)](#install-locally)
 [![Tested with PF2e 8.6.1](https://img.shields.io/badge/Tested_with-PF2e_8.6.1-purple)](docs/VERIFICATION.md)
+[![Tested with SF2e 1.6.1](https://img.shields.io/badge/Tested_with-SF2e_1.6.1-purple)](docs/VERIFICATION.md)
 [![Development version](https://img.shields.io/badge/version-0.2.0_development-blue)](module.json)
 [![Checks](https://github.com/tom-l-mot/pf2e-complete-spellbook/actions/workflows/validate.yml/badge.svg)](https://github.com/tom-l-mot/pf2e-complete-spellbook/actions/workflows/validate.yml)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -9,7 +10,9 @@
 
 Browse your available spells, prepare them for the day, and save sets you can load again later. This Foundry VTT module is built for Pathfinder Second Edition and Starfinder Second Edition. It runs inside Foundry within the Spellcasting Tab.
 
-**Version 0.2.0 is an installable development MVP.** Enable it in a PF2e or SF2e world. The manifest and runtime controls set no version limits. SF2e source compatibility is grounded in the shared upstream code; live validation of this combined version remains open. Version 0.1.0 passed live checks on Foundry 14.369 with PF2e 8.6.1, using test characters for eleven spellcasting classes. Other versions are untested and may have incompatible APIs. Full multiplayer and player-permission testing remains open. Use a test world first. The manifest does not claim a verified runtime version.
+**Version 0.2.0 is an installable development MVP.** Focused live checks passed in separate disposable worlds on Foundry 14.369 with PF2e 8.6.1 and SF2e 1.6.1. They covered browsing, native sorting, favorites, preparation safeguards, presets, spent slots, and reload persistence using minimal character fixtures. See [the verification record](docs/VERIFICATION.md) for the exact scope.
+
+The manifest and runtime controls set no version limits. Other versions, full class builds, native casting actions, multiplayer, and player-only permissions remain untested for this combined build. Use a test world first. The module keeps its existing `pf2e-complete-spellbook` ID, settings, and installation folder. The repository and Foundry package slug can also stay unchanged when the display name is updated.
 
 In SF2e, Mystic and Witchwarper repertoires show owned spells and retain native casting and signature behavior. The module cannot import whole traditions, prepare slots, or apply preparation presets to repertoire entries. Custom prepared SF2e lists require explicit GM review in **Spellbook settings**. No PF2e class rule is applied automatically in SF2e, including copied classes. Native spell sorting uses the shared sheet structure.
 

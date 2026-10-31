@@ -10,7 +10,29 @@ The combined version uses the existing browser, sorting, catalog, and document o
 - [Item data](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/src/module/item/base/data/system.ts) and [item document](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/src/module/item/base/document.ts) store grant provenance under the active system namespace.
 - [Spell collection](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/src/module/item/spellcasting-entry/collection.ts) retains `prepareSpell(spell, groupId, slotIndex)`.
 
-These source facts do not establish live compatibility. The historical PF2e results below apply to their stated versions. Combined 0.2.0 live testing, SF2e sheet behavior, and multiplayer/player permission acceptance remain open until actual results are recorded. See [the combined manual matrix](MANUAL_TESTING.md#combined-020-acceptance).
+Source inspection and the focused live checks below establish different parts of the evidence. The historical PF2e results later in this document apply to their stated versions. See [the combined manual matrix](MANUAL_TESTING.md#combined-020-acceptance) for the remaining full acceptance work.
+
+## Combined 0.2.0 live checks, 2026-10-30
+
+Used an isolated licensed Foundry 14.369 server with copied PF2e 8.6.1 and SF2e 1.6.1 installations. Each system had its own disposable world, a GM session, and only Complete Spellbook active. The existing Foundry server and campaign were not changed. The test server used Node 24.19.0.
+
+| Check | Result |
+| --- | --- |
+| PF2e and SF2e startup | Passed. The module API and native sheet controls loaded, with the correct system-specific default spell pack. |
+| SF2e Mystic and Witchwarper fixtures | Passed. Owned spells and favorites displayed, native sorting restored the original view, and unsupported repertoire imports, preparation, and access configuration were refused without actor changes. |
+| SF2e copied Cleric prepared fixture | Passed. Required GM review before preparation. After approval, preparation, preset save/load, and spent-slot preservation worked. |
+| PF2e Cleric and Sorcerer fixtures | Passed. Automatic Cleric tradition access and native Sorcerer restrictions remained intact. Preparation, presets, favorites, sorting, and spent-slot preservation worked. |
+| Real PF2e and SF2e compendium imports | Passed in both systems. Imported one approved virtual spell, repeated the import without a duplicate, and preserved the expended preparation slot. SF2e's reviewed prepared list displayed real virtual spells from `sf2e.spells`. |
+| Real unlearned repertoire spells | Passed in both systems. A real unowned common divine spell from the configured source pack was refused without actor changes. Synthetic tests additionally cover stale grants. |
+| Reload in both systems | Passed. Owned spells, favorites, presets, prepared assignments, and expended states persisted. |
+| Browser DOM checks in both systems | Passed. Ran the bundled `runSpellSortDomChecks()` including Mystic and Witchwarper row restoration. |
+| Final captured browser error logs | Empty for both recorded system checks. This is not an exhaustive log audit. |
+
+The live harness used native document APIs and the module's actual application/controller. Class fixtures contained minimal native class documents with the relevant slugs, not complete playable class builds. Browsing and sorting compared actor snapshots. Native casting and signature actions, non-GM sessions, simultaneous clients, all subclasses, and interactions with other modules remain outside this pass.
+
+Automated verification used the exclusive local build mirror. `npm run check` passed strict TypeScript checks, 88 tests, bundling, and ZIP content validation with both Node 26.4.0 and Node 24.19.0. `node --test tests/settings.test.ts` also passed after its expected pack IDs were made literal. Initial fixture and tooling failures were corrected before the recorded successful runs. Local harness, JSON results, screenshots, and detailed notes are retained in the ignored `.audit` folder.
+
+Independent Astra review of the implementation and settings assertions found no actionable correctness or security findings and independently passed 85 focused tests. No public release or Foundry listing change is implied by these checks.
 
 This is a development MVP. The original automated record below is followed by live testing updates. Synthetic tests and live checks cover different parts of the module.
 

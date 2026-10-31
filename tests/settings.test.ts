@@ -3,7 +3,8 @@ import test from 'node:test';
 import { DEFAULT_SOURCES, isSupportedSystem, registerSettings } from '../src/settings.ts';
 
 test('system defaults register without changing saved sources, including an empty choice', () => {
-  for (const [systemId, expected] of Object.entries(DEFAULT_SOURCES)) {
+  assert.deepEqual(DEFAULT_SOURCES, { pf2e: 'pf2e.spells-srd', sf2e: 'sf2e.spells' });
+  for (const [systemId, expected] of [['pf2e', 'pf2e.spells-srd'], ['sf2e', 'sf2e.spells']]) {
     for (const saved of [undefined, 'custom.spells', '']) {
       const registered = new Map<string, Record<string, unknown>>();
       const persisted = new Map(saved === undefined ? [] : [['sources', saved]]);

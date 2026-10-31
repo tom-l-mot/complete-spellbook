@@ -14,9 +14,9 @@ Run these checks in each system. Record actual results in VERIFICATION.md; this 
 | SF2e granted prepared entry | Read active-system grant provenance; entry remains subject to GM review. |
 | Unsupported system | No module API, sheet controls, hooks, or settings registration. |
 
-Inspect both systems as GM and player owner. Test reload, disablement, permission loss, and unchanged native casting resources. SF2e live results remain open until recorded.
+Inspect both systems as GM and player owner. Test reload, disablement, permission loss, and unchanged native casting resources. Focused GM fixture checks for both systems are recorded in [VERIFICATION.md](VERIFICATION.md); they do not complete this full matrix.
 
-Status: **NOT RUN**. Automated synthetic tests are not substitutes for these steps. A local Foundry 14.369 campaign was running with a connected user; this task did not install into, restart, or modify that world.
+Status: **FULL MATRIX INCOMPLETE**. Automated synthetic tests and focused GM fixtures are not substitutes for all these steps. The combined build was tested in isolated disposable worlds. The existing campaign was not modified.
 
 ## Prepare an isolated world
 
