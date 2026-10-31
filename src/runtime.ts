@@ -236,7 +236,9 @@ export class Spellbook {
       error = preparationError(e, this.grant(e), spell, rank, index); if (error) throw new Error(error);
       const collection = this.actor.items.get(entryId)?.spells;
       if (!collection || typeof collection.prepareSpell !== 'function') throw new Error('Unsupported system preparation API.');
-      this.assertOwner(); const result = await collection.prepareSpell(item, rank === 0 ? 'cantrips' : rank, index);
+      this.assertOwner();
+      if (e.slots.find(s => s.rank === rank)?.prepared[index]?.id === (item?.id ?? null)) return;
+      const result = await collection.prepareSpell(item, rank === 0 ? 'cantrips' : rank, index);
       if (!result) throw new Error('The system refused the preparation. Any imported spell was kept.');
       if (item) await this.remember(item.id);
     });

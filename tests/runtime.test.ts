@@ -274,6 +274,77 @@ test('Wizard curriculum cantrips reject writes before changing a slot', async ()
 function prepared(item: MemoryItem) {
   return record(record(item.system.slots).slot1).prepared;
 }
+
+for (const system of ['pf2e', 'sf2e']) {
+  for (const expended of [false, true]) {
+    test(`${system} repeated preparation succeeds without changing an ${expended ? 'expended' : 'unspent'} slot`, async () => {
+      const f = fixture(); f.env.system.id = system;
+      await f.book.import('entry', [sourceKey()]);
+      const slots = prepared(f.entry); assert.ok(Array.isArray(slots));
+      slots[0] = { id: 'owned-1', expended };
+      const before = structuredClone(f.entry.system);
+      let writes = 0;
+      f.entry.spells = { prepareSpell: async () => { writes++; return null; } };
+      await f.book.prepare('entry', 'owned-1', 1, 0);
+      assert.deepEqual(f.entry.system, before);
+      assert.equal(f.actor.created.length, 1);
+      assert.equal(writes, 0);
+    });
+
+    test(`${system} clearing an empty ${expended ? 'expended' : 'unspent'} slot succeeds without a native write`, async () => {
+      const f = fixture(); f.env.system.id = system;
+      const slots = prepared(f.entry); assert.ok(Array.isArray(slots));
+      slots[0] = { id: null, expended };
+      const before = structuredClone(f.entry.system);
+      let writes = 0;
+      f.entry.spells = { prepareSpell: async () => { writes++; return null; } };
+      await f.book.prepare('entry', null, 1, 0);
+      assert.deepEqual(f.entry.system, before);
+      assert.equal(writes, 0);
+    });
+  }
+
+  test(`${system} repeated preparation still checks ownership, approval, rank, eligibility and native API support`, async () => {
+    const f = fixture(); f.env.system.id = system;
+    await f.book.import('entry', [sourceKey()]);
+    const slots = prepared(f.entry); assert.ok(Array.isArray(slots));
+    slots[0] = { id: 'owned-1', expended: true };
+    const before = structuredClone(f.entry.system);
+    f.entry.spells = { prepareSpell: async () => assert.fail('Invalid preparation reached the native API.') };
+    f.actor.isOwner = false;
+    await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /ownership/);
+    f.actor.isOwner = true;
+    const grants = f.settings.get('grants');
+    f.settings.set('grants', []);
+    await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /GM must review/);
+    f.settings.set('grants', grants);
+    await f.book.configure('entry', { fullTradition: true, extra: [], preparation: true, allowedRanks: [] });
+    await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /restricted|unconfirmed/);
+    f.settings.set('grants', grants);
+    const spell = f.actor.items.get('owned-1'); assert.ok(spell);
+    record(spell.system).level = { value: 2 };
+    await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /cannot use this slot/);
+    record(spell.system).level = { value: 1 };
+    record(spell.system).location = { value: 'other-entry' };
+    await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /cannot use this slot/);
+    record(spell.system).location = { value: 'entry' };
+    f.entry.spells = undefined;
+    await assert.rejects(f.book.prepare('entry', 'owned-1', 1, 0), /Unsupported system preparation API/);
+    assert.deepEqual(f.entry.system, before);
+  });
+
+  test(`${system} a native null result still refuses a different preparation`, async () => {
+    const f = fixture(); f.env.system.id = system;
+    const before = structuredClone(f.entry.system);
+    let writes = 0;
+    f.entry.spells = { prepareSpell: async () => { writes++; return null; } };
+    await assert.rejects(f.book.prepare('entry', sourceKey(), 1, 0), /system refused the preparation/);
+    assert.deepEqual(f.entry.system, before);
+    assert.equal(f.actor.created.length, 1);
+    assert.equal(writes, 1);
+  });
+}
+
 function preset(entryId = 'entry'): Preset {
   return { version: 1, id: 'synthetic-preset', name: 'Synthetic preparation', entryId,
     assignments: [{ rank: 1, index: 0, spellId: 'owned-1' }, { rank: 1, index: 1, spellId: null }] };

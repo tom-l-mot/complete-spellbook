@@ -10,6 +10,10 @@ Run these checks in each system. Record actual results in VERIFICATION.md; this 
 | New SF2e world | Default source is `sf2e.spells`; browser button and native sorting use the shared sheet. |
 | Either system with custom or empty sources | Reload preserves the exact saved value. |
 | SF2e Mystic and Witchwarper | Browse owned repertoire, open native spell details, and sort rows. No virtual tradition spells, preparation, import, or preparation presets, including with stale grants. |
+| SF2e Mystic connections | Exercise Akashic, Elemental, Healing, Rhythm, and Shadow. Preserve divine, occult, or primal repertoire and separate epiphany focus spells. Verify native casting and signature controls in the sorted view. |
+| SF2e Witchwarper paradoxes | Exercise Analyst, Anomaly, Gap Influenced, and Precog. Preserve arcane or occult repertoire and separate warp focus spells. Verify native casting and signature controls in the sorted view. |
+| SF2e Technomancer | Exercise DPS++, FORTRUN, Servoshell, and Viper. Require GM approval for ordinary prepared ranks with full-tradition access disabled. Preserve the owned spell database and separate Magic Hack focus spells. Test preparation, heightening, presets, spent slots, and native casting. Leave special high-level features unapproved unless separately verified. |
+| SF2e Envoy, Mechanic, Operative, Solarian, and Soldier | With no spell entries, opening the module and native sheet adds no spells or casting entries. Test spells gained through other features separately. |
 | SF2e custom prepared list or copied Cleric | Requires explicit GM review before virtual discovery or preparation. Confirm ordinary ranks only; verify spent slots survive preparation and preset restore. |
 | SF2e granted prepared entry | Read active-system grant provenance; entry remains subject to GM review. |
 | Unsupported system | No module API, sheet controls, hooks, or settings registration. |
@@ -17,6 +21,8 @@ Run these checks in each system. Record actual results in VERIFICATION.md; this 
 Inspect both systems as GM and player owner. Test reload, disablement, permission loss, and unchanged native casting resources. Focused GM fixture checks for both systems are recorded in [VERIFICATION.md](VERIFICATION.md); they do not complete this full matrix.
 
 Status: **FULL MATRIX INCOMPLETE**. Automated synthetic tests and focused GM fixtures are not substitutes for all these steps. The combined build was tested in isolated disposable worlds. The existing campaign was not modified.
+
+The SF2e class matrix passed on 2026-10-30 across 49 actors, including all 13 shipped casting options. See [the class verification record](VERIFICATION.md#sf2e-class-matrix-2026-10-30) for exact checks, fixture fidelity, and remaining limits.
 
 ## Prepare an isolated world
 
