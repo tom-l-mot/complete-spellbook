@@ -1,5 +1,17 @@
 # Verification record
 
+## Combined 0.2.0 scope
+
+The combined version uses the existing browser, sorting, catalog, and document operations for both systems. Source inspection is pinned to upstream commit `675d2b7d613a80572b0330364ce84659068abe66`:
+
+- [SF2e manifest](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/system.sf2e.json) defines the `spells` pack (`sf2e.spells`).
+- [Build configuration](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/vite.config.ts) builds both systems from `src/pf2e.ts` with system identity injected.
+- [Shared spellcasting template](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/static/templates/actors/character/tabs/spellcasting.hbs) retains the known-spells selectors and `PF2E` localization namespace used by sorting.
+- [Item data](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/src/module/item/base/data/system.ts) and [item document](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/src/module/item/base/document.ts) store grant provenance under the active system namespace.
+- [Spell collection](https://github.com/foundryvtt/pf2e/blob/675d2b7d613a80572b0330364ce84659068abe66/src/module/item/spellcasting-entry/collection.ts) retains `prepareSpell(spell, groupId, slotIndex)`.
+
+These source facts do not establish live compatibility. The historical PF2e results below apply to their stated versions. Combined 0.2.0 live testing, SF2e sheet behavior, and multiplayer/player permission acceptance remain open until actual results are recorded. See [the combined manual matrix](MANUAL_TESTING.md#combined-020-acceptance).
+
 This is a development MVP. The original automated record below is followed by live testing updates. Synthetic tests and live checks cover different parts of the module.
 
 ## Commands and results

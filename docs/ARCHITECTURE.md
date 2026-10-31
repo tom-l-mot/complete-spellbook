@@ -2,7 +2,7 @@
 
 ## Usage
 
-An owner opens Complete Spellbook from a character sheet, selects an entry or all entries, and searches existing and eligible virtual spells. Supported ordinary entries are recognized automatically. The GM checks ambiguous entries and uncertain whole ranks. A preparation action imports only the selected virtual spell. Casting remains on the native PF2e sheet.
+An owner opens Complete Spellbook from a character sheet, selects an entry or all entries, and searches existing and eligible virtual spells. Supported ordinary PF2e entries are recognized automatically. SF2e prepared entries require GM review. The GM checks ambiguous entries and uncertain whole ranks. A preparation action imports only the selected virtual spell. Casting remains on the native character sheet.
 
 ```ts
 const book = new Spellbook(actor, game, catalog);
@@ -14,7 +14,7 @@ await book.applyPreset(entryId, preset, preview.fingerprint);
 
 ## Ownership
 
-`access.ts` recognizes supported class entries and identifies uncertainty. `core.ts` owns pure eligibility, slot validation, filters and assignment-only presets. Spell origins distinguish virtual compendium rows from actor-owned items. `runtime.ts` owns all document effects, the compendium cache and GM grants. `app.ts` owns display and dialogs. `main.ts` connects hooks and version guards; `settings.ts` registers configuration. UI actions cannot bypass runtime permission and policy checks.
+`access.ts` recognizes supported class entries and identifies uncertainty. `core.ts` owns pure eligibility, slot validation, filters and assignment-only presets. Spell origins distinguish virtual compendium rows from actor-owned items. `runtime.ts` owns all document effects, the compendium cache and GM grants. `app.ts` owns display and dialogs. `main.ts` connects hooks and version guards; `settings.ts` owns the supported-system/default-pack table and registers configuration without writing saved values. Both startup hooks use its predicate. `Environment.system.id` is required; recognition reads grant provenance from the active system namespace. UI actions cannot bypass runtime permission and policy checks.
 
 This is an independent implementation. The narrow Foundry declarations describe the methods used; passing TypeScript checks is not proof that the actual runtime implements them. Source verification and manual runtime testing remain separate evidence.
 

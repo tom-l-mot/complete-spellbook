@@ -25,12 +25,12 @@ test('template compiles, translates all labels, and escapes spell names', () => 
 });
 
 test('settings have translated names and hints and manifest paths are local', async () => {
-  const { SETTINGS } = await import('../src/settings.ts');
+  const { SETTINGS, DEFAULT_SOURCES } = await import('../src/settings.ts');
   for (const key of Object.keys(SETTINGS)) { localize(`CS.Settings.${key}.Name`); localize(`CS.Settings.${key}.Hint`); }
   const manifest = JSON.parse(await readFile('module.json', 'utf8'));
   assert.equal(manifest.id, 'pf2e-complete-spellbook');
   assert.equal(manifest.compatibility, undefined);
-  assert.deepEqual(manifest.relationships.systems, [{ id: 'pf2e', type: 'system' }]);
+  assert.deepEqual(manifest.relationships.systems, Object.keys(DEFAULT_SOURCES).map(id => ({ id, type: 'system' })));
   assert.equal(manifest.manifest, undefined);
   assert.equal(manifest.version, JSON.parse(await readFile('package.json', 'utf8')).version);
 });
@@ -48,7 +48,7 @@ test('actual application context paginates and filters synthetic spells; render 
   const actor: ActorDocument = { id: 'test', uuid: 'Actor.test-ui', name: 'Synthetic Cleric', type: 'character', isOwner: true, class: { slug: 'cleric' },
     items: { contents: [entry, ...items], get: id => [entry, ...items].find(i => i.id === id) },
     getFlag: () => [], setFlag: async () => undefined, createEmbeddedDocuments: async () => [], sheet: { render: () => undefined } };
-  const env: Environment = { user: { id: 'gm', isGM: true }, packs: [], settings: { get: (_scope, key) => ['presets', 'favorites', 'import'].includes(key), set: async () => undefined } };
+  const env: Environment = { system: { id: 'pf2e' }, user: { id: 'gm', isGM: true }, packs: [], settings: { get: (_scope, key) => ['presets', 'favorites', 'import'].includes(key), set: async () => undefined } };
   class Base {
     rendered = false;
     async render() { this.rendered = true; return this; }

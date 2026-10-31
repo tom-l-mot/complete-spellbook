@@ -1,10 +1,26 @@
 # Live acceptance test procedure
 
+## Combined 0.2.0 acceptance
+
+Run these checks in each system. Record actual results in VERIFICATION.md; this matrix is a procedure, not a passed test report.
+
+| System and fixture | Required result |
+| --- | --- |
+| New PF2e world | Default source is `pf2e.spells-srd`; existing PF2e preparation and sorting remain functional. |
+| New SF2e world | Default source is `sf2e.spells`; browser button and native sorting use the shared sheet. |
+| Either system with custom or empty sources | Reload preserves the exact saved value. |
+| SF2e Mystic and Witchwarper | Browse owned repertoire, open native spell details, and sort rows. No virtual tradition spells, preparation, import, or preparation presets, including with stale grants. |
+| SF2e custom prepared list or copied Cleric | Requires explicit GM review before virtual discovery or preparation. Confirm ordinary ranks only; verify spent slots survive preparation and preset restore. |
+| SF2e granted prepared entry | Read active-system grant provenance; entry remains subject to GM review. |
+| Unsupported system | No module API, sheet controls, hooks, or settings registration. |
+
+Inspect both systems as GM and player owner. Test reload, disablement, permission loss, and unchanged native casting resources. SF2e live results remain open until recorded.
+
 Status: **NOT RUN**. Automated synthetic tests are not substitutes for these steps. A local Foundry 14.369 campaign was running with a connected user; this task did not install into, restart, or modify that world.
 
 ## Prepare an isolated world
 
-1. Back up a disposable PF2e world. Use Foundry 14.369 and PF2e 8.6.1. Record exact versions and enabled modules.
+1. Back up disposable PF2e and SF2e worlds. The installed reference versions are Foundry 14.369, PF2e 8.6.1, and SF2e 1.6.1. Record the versions actually tested and enabled modules.
 2. Install the release ZIP using the README. Enable only this module for the first pass.
 3. Create a GM and a player account. Assign owner access to test characters and observer/no access to separate characters. Keep a copy of each character's initial JSON export.
 4. Open the browser console and record errors. Open Complete Spellbook from both legacy and current PF2e sheets, if both are available.

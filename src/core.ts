@@ -53,11 +53,11 @@ export function eligible(spell: Spell, entry: Entry, grant: Grant | undefined, p
   return grant.fullTradition && rarityAllowed && spell.traditions.includes(entry.tradition);
 }
 export function preparationError(entry: Entry, grant: Grant | undefined, spell: Spell | null, rank: number, index: number): string | null {
-  if (entry.category !== 'prepared' || (entry.flexible && rank !== 0)) return 'Use the PF2e sheet for this preparation type.';
+  if (entry.category !== 'prepared' || (entry.flexible && rank !== 0)) return 'Use the character sheet for this preparation type.';
   if (!grant?.preparation || grant.entryId !== entry.id || grant.tradition !== entry.tradition || grant.category !== entry.category || grant.slotShape !== slotShape(entry)) {
     return 'The GM must review this entry and its current slot layout before preparation.';
   }
-  if (!grant.allowedRanks.includes(rank)) return 'This restricted or unconfirmed rank group is managed on the PF2e sheet.';
+  if (!grant.allowedRanks.includes(rank)) return 'This restricted or unconfirmed rank group is managed on the character sheet.';
   const group = entry.slots.find(s => s.rank === rank);
   if (!Number.isInteger(index) || index < 0 || !group || group.prepared.length !== group.max || index >= group.max || !group.prepared[index]) return 'The preparation slot no longer exists.';
   if (!spell) return null;
