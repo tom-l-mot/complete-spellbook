@@ -4,17 +4,18 @@
 [![Tested with PF2e 8.6.1](https://img.shields.io/badge/Tested_with-PF2e_8.6.1-purple)](docs/VERIFICATION.md)
 [![Tested with SF2e 1.6.1](https://img.shields.io/badge/Tested_with-SF2e_1.6.1-purple)](docs/VERIFICATION.md)
 [![Development version](https://img.shields.io/badge/version-0.2.0_development-blue)](module.json)
-[![Checks](https://github.com/tom-l-mot/pf2e-complete-spellbook/actions/workflows/validate.yml/badge.svg)](https://github.com/tom-l-mot/pf2e-complete-spellbook/actions/workflows/validate.yml)
+[![Checks](https://github.com/tom-l-mot/complete-spellbook/actions/workflows/validate.yml/badge.svg)](https://github.com/tom-l-mot/complete-spellbook/actions/workflows/validate.yml)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Support on Ko-fi](https://img.shields.io/badge/Support_on_Ko--fi-FF5E5B?style=flat&logo=kofi&logoColor=white)](https://ko-fi.com/tomlmot)
+[![Follow on Patreon](https://img.shields.io/badge/Follow_on-Patreon-FF424D?style=flat&logo=patreon&logoColor=white)](https://www.patreon.com/TheOpenTableWorkshop)
 
 Browse your available spells, prepare them for the day, and save sets you can load again later. This Foundry VTT module is built for Pathfinder Second Edition and Starfinder Second Edition. It runs inside Foundry within the Spellcasting Tab.
 
-**Version 0.2.0 is an installable development MVP.** Focused live checks passed in separate disposable worlds on Foundry 14.369 with PF2e 8.6.1 and SF2e 1.6.1. They covered browsing, native sorting, favorites, preparation safeguards, presets, spent slots, and reload persistence using minimal character fixtures. See [the verification record](docs/VERIFICATION.md) for the exact scope.
+**Version 0.2.0 supports PF2e and SF2e.** Focused live checks passed in separate disposable worlds on Foundry 14.369 with PF2e 8.6.1 and SF2e 1.6.1. SF2e checks covered all eight shipped classes across 49 actors, including all 13 casting options. They covered applicable browsing, sorting, favorites, native casting, preparation safeguards, presets, spent slots, and reload persistence. See [the verification record](docs/VERIFICATION.md) for fixture details and exact coverage.
 
-The manifest and runtime controls set no version limits. Other versions, full class builds, native casting actions, multiplayer, and player-only permissions remain untested for this combined build. Use a test world first. The module keeps its existing `pf2e-complete-spellbook` ID, settings, and installation folder. The repository and Foundry package slug can also stay unchanged when the display name is updated.
+The manifest and runtime controls set no version limits. Other versions, every class progression and feat combination, multiplayer, and player-only permissions remain unverified. Use a test world first. The module keeps its existing `pf2e-complete-spellbook` ID, settings, installation folder, and Foundry package slug so existing installations can update normally. Its repository is now `complete-spellbook`.
 
-In SF2e, Mystic and Witchwarper repertoires show owned spells and retain native casting and signature behavior. The module cannot import whole traditions, prepare slots, or apply preparation presets to repertoire entries. Custom prepared SF2e lists require explicit GM review in **Spellbook settings**. No PF2e class rule is applied automatically in SF2e, including copied classes. Native spell sorting uses the shared sheet structure.
+In SF2e, Mystic and Witchwarper repertoires show owned spells and retain native casting and signature behavior. The module cannot import whole traditions, prepare slots, or apply preparation presets to repertoire entries. Technomancer and other prepared SF2e lists require explicit GM review in **Spellbook settings**. Keep full-tradition access disabled for a Technomancer's owned spell database. No PF2e class rule is applied automatically in SF2e, including copied classes. Native spell sorting uses the shared sheet structure.
 
 ## Screenshots
 
@@ -105,7 +106,7 @@ On filesystems that reject npm package extraction, copy the source to a normal l
 
 ## Manifest URL distribution
 
-The source is saved in [tom-l-mot/pf2e-complete-spellbook](https://github.com/tom-l-mot/pf2e-complete-spellbook). Version 0.2.0 is prepared locally and its release assets are not published yet. The source manifest omits download URLs. Release builds generate those URLs from `GITHUB_REPOSITORY`.
+The source and releases are in [tom-l-mot/complete-spellbook](https://github.com/tom-l-mot/complete-spellbook). Use [the latest module manifest](https://github.com/tom-l-mot/complete-spellbook/releases/latest/download/module.json) to install or update through Foundry. The source manifest omits download URLs. Release builds generate those URLs from `GITHUB_REPOSITORY`.
 
 When this repository is published under an owner-approved GitHub repository, the supplied release workflow builds URLs from `GITHUB_REPOSITORY`, validates the version tag, and creates a **draft** release for `v0.2.0`. Publish the reviewed release and use its `module.json` asset URL in Foundry's **Install Module → Manifest URL** field. That manifest points to the versioned ZIP and a latest-release manifest for updates. Do not paste a guessed URL before those assets exist.
 
